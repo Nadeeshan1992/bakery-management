@@ -113,6 +113,74 @@
             border-radius: 10px;
         }
 
+        /* Dashboard Styles */
+        .dash-hero-card {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1px solid #fed7aa;
+            border-radius: 16px;
+        }
+        .dash-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(217, 119, 36, 0.15);
+        }
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+        }
+        .dash-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 6px 2px;
+            border-radius: 12px;
+            transition: all 0.15s ease;
+        }
+        .dash-action-btn:active {
+            transform: scale(0.95);
+            background: #f8fafc;
+        }
+        .action-icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            margin-bottom: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .action-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        .dash-prod-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .dash-prod-scroll::-webkit-scrollbar-thumb {
+            background: #fed7aa;
+            border-radius: 4px;
+        }
+        .dash-prod-chip {
+            min-width: 125px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
         .credit-banner {
             background: #f8f9fa;
             border-left: 4px solid #0d6efd;
@@ -176,7 +244,12 @@
                 <small class="text-white-50" style="font-size: 0.7rem;" id="headerUserSub">Sales Person Portal</small>
             </div>
         </div>
-        <span class="badge-role" id="headerUserBadge">Sales</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge-role" id="headerUserBadge">Sales</span>
+            <button class="btn btn-sm text-white-50 p-0 px-1" id="headerLogoutBtn" style="display:none;" onclick="doMobileLogout()" title="Log out">
+                <i class="fa-solid fa-right-from-bracket fs-6 text-white"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Body Container -->
@@ -209,6 +282,132 @@
                 </button>
                 <div class="text-center mt-2">
                     <small class="text-muted" style="font-size: 0.68rem;">Instant testing without server on Vercel</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: DASHBOARD (HOME) -->
+        <div id="screenDashboard" class="screen">
+            <!-- Welcome Hero -->
+            <div class="dash-hero-card mb-3 p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle mb-1 text-xs" id="dashGreetingBadge"><i class="fa-solid fa-sun text-warning me-1"></i> Good Day</span>
+                        <h5 class="fw-bold text-dark mb-0" id="dashWelcomeName">Sales Executive</h5>
+                        <div class="text-muted text-xs mt-1" id="dashDateToday"><i class="fa-regular fa-calendar me-1"></i> Today's Route Active</div>
+                    </div>
+                    <div class="dash-avatar">
+                        <i class="fa-solid fa-user-tie fs-4 text-warning"></i>
+                    </div>
+                </div>
+
+                <!-- Primary CTA Button -->
+                <button class="btn btn-warning w-100 fw-bold py-2 mt-3 shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="openNewOrderScreen()">
+                    <i class="fa-solid fa-circle-plus fs-5"></i>
+                    <span>Book New Pre-Order</span>
+                </button>
+            </div>
+
+            <!-- Quick Stat KPI Grid -->
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div class="card card-custom p-2 kpi-card border-start border-4 border-primary">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted text-xs">Today's Sales</span>
+                            <span class="badge bg-primary-subtle text-primary text-xs" id="dashKpiOrdersCount">0 orders</span>
+                        </div>
+                        <strong class="fs-6 text-dark" id="dashKpiTotalSales">Rs. 0.00</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card card-custom p-2 kpi-card border-start border-4 border-success">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted text-xs">Collected</span>
+                            <i class="fa-solid fa-circle-check text-success text-xs"></i>
+                        </div>
+                        <strong class="fs-6 text-success" id="dashKpiCollected">Rs. 0.00</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card card-custom p-2 kpi-card border-start border-4 border-danger">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted text-xs">Due Balance</span>
+                            <i class="fa-solid fa-clock-rotate-left text-danger text-xs"></i>
+                        </div>
+                        <strong class="fs-6 text-danger" id="dashKpiDue">Rs. 0.00</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card card-custom p-2 kpi-card border-start border-4 border-info">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted text-xs">Customers</span>
+                            <i class="fa-solid fa-users text-info text-xs"></i>
+                        </div>
+                        <strong class="fs-6 text-info" id="dashKpiCustCount">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Hub -->
+            <div class="card card-custom p-3 mb-3">
+                <div class="fw-bold text-xs text-dark mb-2"><i class="fa-solid fa-bolt text-warning me-1"></i> Quick Shortcuts</div>
+                <div class="row g-2 text-center">
+                    <div class="col-3">
+                        <div class="dash-action-btn" onclick="openNewOrderScreen()">
+                            <div class="action-icon-circle bg-warning-subtle text-warning">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </div>
+                            <span class="action-label">Book</span>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-action-btn" onclick="openCreateCustomerModal()">
+                            <div class="action-icon-circle bg-info-subtle text-info">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <span class="action-label">+ Customer</span>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-action-btn" onclick="switchScreen('screenOrders')">
+                            <div class="action-icon-circle bg-success-subtle text-success">
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                            </div>
+                            <span class="action-label">Settle</span>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-action-btn" onclick="switchScreen('screenReports')">
+                            <div class="action-icon-circle bg-primary-subtle text-primary">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <span class="action-label">Report</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fast-Add Popular Items -->
+            <div class="card card-custom p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="fw-bold text-xs text-dark"><i class="fa-solid fa-fire text-danger me-1"></i> Fast-Order Popular Items</div>
+                    <span class="text-muted text-xs">1-Tap Add</span>
+                </div>
+                <div class="dash-prod-scroll d-flex gap-2 pb-1" id="dashPopularProdsContainer" style="overflow-x: auto;">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+
+            <!-- Recent Orders Feed -->
+            <div class="card card-custom p-3 mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="fw-bold text-xs text-dark"><i class="fa-solid fa-clock-rotate-left text-primary me-1"></i> Recent Pre-Orders</div>
+                    <button class="btn btn-link p-0 text-xs text-decoration-none fw-bold text-warning" onclick="switchScreen('screenOrders')">
+                        View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </button>
+                </div>
+                <div id="dashRecentOrdersList">
+                    <!-- Filled dynamically -->
                 </div>
             </div>
         </div>
@@ -407,13 +606,17 @@
 
     <!-- Footer Navigation -->
     <div class="phone-footer" id="phoneFooter" style="display: none;">
-        <button class="nav-tab-btn active" id="tabBtnOrders" onclick="switchScreen('screenOrders')">
+        <button class="nav-tab-btn active" id="tabBtnDash" onclick="switchScreen('screenDashboard')">
+            <i class="fa-solid fa-house fs-6"></i>
+            <span>Home</span>
+        </button>
+        <button class="nav-tab-btn" id="tabBtnOrders" onclick="switchScreen('screenOrders')">
             <i class="fa-solid fa-receipt fs-6"></i>
             <span>Orders</span>
         </button>
         <button class="nav-tab-btn" id="tabBtnBook" onclick="openNewOrderScreen()">
-            <i class="fa-solid fa-plus-circle fs-6"></i>
-            <span>Book New</span>
+            <i class="fa-solid fa-circle-plus fs-5 text-warning"></i>
+            <span>Book</span>
         </button>
         <button class="nav-tab-btn" id="tabBtnCust" onclick="switchScreen('screenCustomers')">
             <i class="fa-solid fa-users fs-6"></i>
@@ -421,11 +624,7 @@
         </button>
         <button class="nav-tab-btn" id="tabBtnReport" onclick="switchScreen('screenReports')">
             <i class="fa-solid fa-chart-pie fs-6"></i>
-            <span>Sales Report</span>
-        </button>
-        <button class="nav-tab-btn" onclick="doMobileLogout()">
-            <i class="fa-solid fa-right-from-bracket fs-6"></i>
-            <span>Logout</span>
+            <span>Reports</span>
         </button>
     </div>
 </div>
@@ -574,9 +773,11 @@ function startDemoMode() {
     document.getElementById('headerUserSub').innerText = 'John Sales (Demo Mode)';
     document.getElementById('headerUserBadge').innerText = 'Demo';
     document.getElementById('headerUserBadge').className = 'badge bg-warning text-dark';
+    const logoutBtn = document.getElementById('headerLogoutBtn');
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
     document.getElementById('phoneFooter').style.display = 'flex';
-    switchScreen('screenOrders');
     loadMasterData();
+    switchScreen('screenDashboard');
 }
 
 function switchScreen(screenId) {
@@ -586,7 +787,10 @@ function switchScreen(screenId) {
     const targetEl = document.getElementById(screenId);
     if (targetEl) targetEl.classList.add('active');
 
-    if (screenId === 'screenOrders') {
+    if (screenId === 'screenDashboard') {
+        document.getElementById('tabBtnDash')?.classList.add('active');
+        loadMobileDashboard();
+    } else if (screenId === 'screenOrders') {
         document.getElementById('tabBtnOrders')?.classList.add('active');
         loadMobileOrders();
     } else if (screenId === 'screenCreateOrder') {
@@ -598,6 +802,187 @@ function switchScreen(screenId) {
         document.getElementById('tabBtnReport')?.classList.add('active');
         loadMobileSalesReport();
     }
+}
+
+async function loadMobileDashboard() {
+    // 1. Dynamic Greeting
+    const hour = new Date().getHours();
+    let greeting = 'Good Morning';
+    let icon = 'fa-sun';
+    if (hour >= 12 && hour < 17) {
+        greeting = 'Good Afternoon';
+        icon = 'fa-sun';
+    } else if (hour >= 17) {
+        greeting = 'Good Evening';
+        icon = 'fa-moon';
+    }
+    const greetBadge = document.getElementById('dashGreetingBadge');
+    if (greetBadge) {
+        greetBadge.innerHTML = `<i class="fa-solid ${icon} text-warning me-1"></i> ${greeting}`;
+    }
+
+    // 2. Sales rep name
+    const nameEl = document.getElementById('dashWelcomeName');
+    const headerName = document.getElementById('headerUserSub') ? document.getElementById('headerUserSub').innerText : '';
+    if (nameEl) nameEl.innerText = headerName.replace('(Demo Mode)', '').trim() || 'Sales Executive';
+
+    // 3. Date
+    const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    const dateEl = document.getElementById('dashDateToday');
+    if (dateEl) dateEl.innerHTML = `<i class="fa-regular fa-calendar me-1"></i> ${todayStr}`;
+
+    // 4. Products & Customers count
+    renderDashPopularProducts();
+    const custCountEl = document.getElementById('dashKpiCustCount');
+    if (custCountEl) {
+        custCountEl.innerText = String((customerList && customerList.length > 0) ? customerList.length : demoCustomers.length);
+    }
+
+    // 5. Orders & KPIs calculation
+    let ordersList = demoOrders;
+    if (!isDemoMode && apiToken) {
+        try {
+            const res = await fetch(`${API_BASE}/orders/list.php`, { headers: { 'X-API-Token': apiToken } });
+            const data = await res.json();
+            if (data.success && data.data) {
+                ordersList = data.data;
+                window.cachedOrders = data.data;
+            }
+        } catch (e) {
+            console.warn('Dashboard fetch fallback to cached/demo', e);
+            ordersList = window.cachedOrders || demoOrders;
+        }
+    }
+
+    let totalSales = 0;
+    let totalCollected = 0;
+    let totalDue = 0;
+
+    ordersList.forEach(o => {
+        totalSales += parseFloat(o.total_amount) || 0;
+        totalCollected += parseFloat(o.paid_amount) || 0;
+        totalDue += parseFloat(o.balance_due) || 0;
+    });
+
+    const ordersCountEl = document.getElementById('dashKpiOrdersCount');
+    const salesEl = document.getElementById('dashKpiTotalSales');
+    const collEl = document.getElementById('dashKpiCollected');
+    const dueEl = document.getElementById('dashKpiDue');
+
+    if (ordersCountEl) ordersCountEl.innerText = `${ordersList.length} orders`;
+    if (salesEl) salesEl.innerText = `Rs. ${totalSales.toFixed(2)}`;
+    if (collEl) collEl.innerText = `Rs. ${totalCollected.toFixed(2)}`;
+    if (dueEl) dueEl.innerText = `Rs. ${totalDue.toFixed(2)}`;
+
+    renderDashRecentOrders(ordersList);
+}
+
+function renderDashPopularProducts() {
+    const container = document.getElementById('dashPopularProdsContainer');
+    if (!container) return;
+    const prods = (productList && productList.length > 0) ? productList : demoProducts;
+    let html = '';
+    prods.slice(0, 7).forEach(p => {
+        const inStock = p.current_stock > 0;
+        html += `
+            <div class="dash-prod-chip">
+                <div>
+                    <div class="fw-bold text-xs text-dark text-truncate" title="${p.name}">${p.name}</div>
+                    <div class="text-success fw-bold text-xs mt-1">Rs. ${parseFloat(p.effective_price).toFixed(2)}</div>
+                    <small class="${inStock ? 'text-muted' : 'text-danger fw-bold'}" style="font-size:0.65rem;">${inStock ? 'Stock: ' + p.current_stock : 'Out of stock'}</small>
+                </div>
+                <button class="btn btn-sm ${inStock ? 'btn-outline-warning text-dark' : 'btn-outline-secondary disabled'} py-0 px-2 mt-2 text-xs fw-bold align-self-end" onclick="quickAddProdToCart(${p.id})">
+                    <i class="fa-solid fa-plus me-1"></i> Add
+                </button>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function quickAddProdToCart(prodId) {
+    const prods = (productList && productList.length > 0) ? productList : demoProducts;
+    const prod = prods.find(p => p.id === prodId);
+    if (!prod) return;
+    if (prod.current_stock <= 0) {
+        MobileSwal.fire({
+            icon: 'warning',
+            title: 'Out of Stock',
+            text: `"${prod.name}" is currently out of stock!`,
+            confirmButtonColor: '#d97724'
+        });
+        return;
+    }
+    const existing = mobileCart.find(i => i.product_id === prodId);
+    if (existing) {
+        if (existing.qty + 1 > prod.current_stock) {
+            MobileSwal.fire({
+                icon: 'warning',
+                title: 'Stock Limit Reached',
+                text: `Available stock is only ${prod.current_stock} pcs.`,
+                confirmButtonColor: '#d97724'
+            });
+            return;
+        }
+        existing.qty += 1;
+    } else {
+        mobileCart.push({
+            product_id: prod.id,
+            name: prod.name,
+            price: prod.effective_price,
+            category_name: prod.category_name,
+            qty: 1
+        });
+    }
+    renderMobileCart();
+    switchScreen('screenCreateOrder');
+    MobileSwal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'success',
+        title: `Added "${prod.name}" to cart`,
+        showConfirmButton: false,
+        timer: 1500
+    });
+}
+
+function renderDashRecentOrders(ordersSource) {
+    const container = document.getElementById('dashRecentOrdersList');
+    if (!container) return;
+    const recent = (ordersSource || []).slice(0, 3);
+    if (recent.length === 0) {
+        container.innerHTML = '<div class="text-muted text-center py-2 text-xs">No orders booked yet today.</div>';
+        return;
+    }
+
+    let html = '';
+    recent.forEach(o => {
+        const isPaid = o.payment_status === 'paid' || o.balance_due <= 0;
+        const payBadgeClass = isPaid ? 'bg-success' : (o.payment_status === 'partial' ? 'bg-warning text-dark' : 'bg-danger');
+        const payStatusText = isPaid ? 'PAID' : (o.payment_status === 'partial' ? 'PARTIAL' : 'UNPAID');
+        const safeCustName = (o.customer_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+        html += `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2 text-xs">
+                <div style="flex:1; min-width: 0;" class="pe-2">
+                    <div class="fw-bold text-dark text-truncate">${o.customer_name}</div>
+                    <div class="text-muted" style="font-size:0.68rem;">#${o.order_number} &bull; ${o.payment_method || 'cash'}</div>
+                </div>
+                <div class="text-end">
+                    <div><strong class="text-dark">Rs. ${parseFloat(o.total_amount).toFixed(2)}</strong></div>
+                    <div class="d-flex align-items-center justify-content-end gap-1 mt-1">
+                        <span class="badge ${payBadgeClass} text-uppercase" style="font-size:0.6rem;">${payStatusText}</span>
+                        ${!isPaid ? `
+                            <button class="btn btn-sm btn-outline-success py-0 px-2 text-xs fw-bold" onclick="openSettleModal(${o.id}, '${o.order_number}', '${safeCustName}', ${o.total_amount}, ${o.paid_amount}, ${o.balance_due})">
+                                Settle
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
 }
 
 async function doMobileLogin() {
@@ -623,9 +1008,11 @@ async function doMobileLogin() {
             apiToken = data.data.api_token;
             currentUserId = data.data.user_id;
             document.getElementById('headerUserSub').innerText = data.data.full_name;
+            const logoutBtn = document.getElementById('headerLogoutBtn');
+            if (logoutBtn) logoutBtn.style.display = 'inline-block';
             document.getElementById('phoneFooter').style.display = 'flex';
-            switchScreen('screenOrders');
             loadMasterData();
+            switchScreen('screenDashboard');
         } else {
             alertBox.innerText = data.message || 'Login failed';
             alertBox.style.display = 'block';
@@ -640,6 +1027,8 @@ async function doMobileLogin() {
 function doMobileLogout() {
     apiToken = '';
     document.getElementById('phoneFooter').style.display = 'none';
+    const logoutBtn = document.getElementById('headerLogoutBtn');
+    if (logoutBtn) logoutBtn.style.display = 'none';
     document.getElementById('headerUserSub').innerText = 'Sales Person Portal';
     document.getElementById('headerUserBadge').innerText = 'Sales';
     document.getElementById('headerUserBadge').className = 'badge-role';
@@ -653,6 +1042,7 @@ async function loadMasterData() {
         populateCustDropdown();
         populateProdDropdown();
         renderMobileCustomersList();
+        loadMobileDashboard();
         return;
     }
 
