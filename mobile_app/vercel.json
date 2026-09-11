@@ -1,8 +1,6 @@
 {
   "version": 2,
-  "name": "bakery-sales-mobile",
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
