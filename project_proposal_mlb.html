@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Proposal - MLB POS System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8f9fa; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-top: 30px; padding-bottom: 50px; }
+        .proposal-container { max-width: 850px; background: #ffffff; padding: 50px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); margin: 0 auto; border: 1px solid #ebdcd3; }
+        .proposal-header { border-bottom: 3px solid #d97724; padding-bottom: 20px; margin-bottom: 30px; }
+        .module-badge { background-color: #fdf8f5; border: 1px solid #ebdcd3; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .btn-bakery { background-color: #d97724; color: white; font-weight: 600; border: none; padding: 10px 24px; border-radius: 8px; }
+        .btn-bakery:hover { background-color: #b25310; color: white; }
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .proposal-container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container no-print mb-4" style="max-width: 850px;">
+    <div class="d-flex justify-content-between align-items-center">
+        <a href="index.php" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back to System</a>
+        <div class="d-flex gap-2">
+            <a href="project_proposal_mlb.pdf" download class="btn btn-danger btn-sm fw-bold"><i class="fa-solid fa-file-pdf me-1"></i> Download Native PDF</a>
+            <button onclick="window.print()" class="btn btn-bakery btn-sm"><i class="fa-solid fa-print me-1"></i> Print / Save as PDF</button>
+        </div>
+    </div>
+</div>
+
+<div class="proposal-container">
+    <div class="proposal-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <img src="assets/images/mlb_logo.jpg" alt="MLB Logo" style="height: 70px; border-radius: 8px;">
+            <div>
+                <h2 class="fw-bold text-dark mb-0">Project Proposal: MLB POS System</h2>
+                <p class="text-warning fw-bold mb-0">Phase 2 System Expansion & Pricing Breakdown &bull; LKR Currency</p>
+            </div>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-dark text-uppercase px-3 py-2">Version 2.0</span>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4 p-3 rounded bg-light border text-sm">
+        <div class="col-6"><strong>Document:</strong> Technical & Pricing Proposal</div>
+        <div class="col-6 text-end"><strong>Date:</strong> September 02, 2026</div>
+        <div class="col-6"><strong>Prepared For:</strong> MLB Client Management</div>
+        <div class="col-6 text-end"><strong>Prepared By:</strong> AI Systems Engineering Team</div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="mb-5">
+        <h4 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="fa-solid fa-file-contract text-warning me-2"></i> 1. Executive Summary</h4>
+        <p><strong>MLB POS System</strong> is an end-to-end management solution designed for bakery operations, counter billing, raw ingredient inventory, and customer account management.</p>
+        <p>Following the successful deployment of Phase 1 (Web POS, Inventory BOM, Customer Profiles, and Executive Reporting), this proposal outlines <strong>Phase 2 Technical Expansions</strong> requested by MLB Management:</p>
+        <ul>
+            <li><strong>SMS Gateway Integration:</strong> Automated SMS notifications for receipts, custom cake status updates, and credit period reminders.</li>
+            <li><strong>Product Return & Refund Handling:</strong> Complete workflow for customer exchanges, damaged stock classification, and credit notes.</li>
+            <li><strong>MLB Mobile Application (iOS & Android):</strong> Mobile app suite featuring Owner Dashboard, Driver Delivery GPS Routing, and Mobile POS.</li>
+        </ul>
+    </div>
+
+    <!-- Phase 2 Modules -->
+    <div class="mb-5">
+        <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="fa-solid fa-cubes text-warning me-2"></i> 2. Proposed Technical Modules</h4>
+
+        <!-- Module 1 -->
+        <div class="module-badge">
+            <h5 class="fw-bold text-dark mb-2"><i class="fa-solid fa-comment-sms text-warning me-2"></i> Module 1: SMS Gateway Integration</h5>
+            <p class="text-muted text-sm mb-3">Integrating local Sri Lankan SMS Gateways (Dialog, Mobitel, or Notify.lk API) for automated customer notifications:</p>
+            <ul class="mb-0 text-sm">
+                <li class="mb-2"><strong>Order Confirmation SMS:</strong> Sends immediate SMS receipt to customers upon checkout containing Order # and Total Amount (Rs.).</li>
+                <li class="mb-2"><strong>Custom Order Status Alerts:</strong> Automatic SMS when cake status changes (<em>In Production &rarr; Ready &rarr; Out for Delivery</em>).</li>
+                <li class="mb-2"><strong>Credit Payment Reminders:</strong> Automated SMS sent 3 days before credit period expiry for wholesale accounts.</li>
+                <li><strong>Promotional Broadcasts:</strong> Broadcast festival discount SMS campaigns to registered customer mobile numbers.</li>
+            </ul>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="module-badge">
+            <h5 class="fw-bold text-dark mb-2"><i class="fa-solid fa-rotate-left text-warning me-2"></i> Module 2: Product Return & Refund Handling</h5>
+            <p class="text-muted text-sm mb-3">A structured module to handle returns, replacements, and damaged bakery goods:</p>
+            <ul class="mb-0 text-sm">
+                <li class="mb-2"><strong>Customer Return Interface:</strong> Search invoice #, select specific items returned, and select reason (Damaged/Expired, Wrong Item, Exchange).</li>
+                <li class="mb-2"><strong>Stock Classification:</strong> Re-salable items are restocked automatically; damaged items are logged to Spoilage Inventory.</li>
+                <li><strong>Credit Notes & Refunds:</strong> Generates printable Credit Notes or processes instant cash/UPI refunds.</li>
+            </ul>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="module-badge">
+            <h5 class="fw-bold text-dark mb-2"><i class="fa-solid fa-mobile-screen-button text-warning me-2"></i> Module 3: MLB Mobile Application Suite</h5>
+            <p class="text-muted text-sm mb-3">Cross-platform mobile applications for iOS & Android built using Flutter / React Native:</p>
+            <ul class="mb-0 text-sm">
+                <li class="mb-2"><strong>Owner Dashboard App:</strong> Real-time sales ticker, revenue metrics, and push alerts for low stock.</li>
+                <li class="mb-2"><strong>Delivery Driver App:</strong> Scheduled delivery queue, Google Maps navigation, signature capture, and COD logging.</li>
+                <li><strong>Mobile Tablet POS:</strong> Portable ordering interface for staff during peak hours.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="mb-5">
+        <h4 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="fa-solid fa-calendar-days text-warning me-2"></i> 3. Phased Implementation Roadmap</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Milestone</th>
+                        <th>Description</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Milestone 1</td><td>RESTful API Development & Security Authentication</td><td>1.5 Weeks</td></tr>
+                    <tr><td>Milestone 2</td><td>SMS Gateway API Integration & Automated Triggers</td><td>1.0 Week</td></tr>
+                    <tr><td>Milestone 3</td><td>Product Return, Credit Note & Waste Handling Module</td><td>1.5 Weeks</td></tr>
+                    <tr><td>Milestone 4</td><td>Mobile App Development (Owner & Driver Apps)</td><td>3.0 Weeks</td></tr>
+                    <tr><td>Milestone 5</td><td>UAT Testing, Final Deployment & Staff Training</td><td>1.0 Week</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Commercial Pricing Breakdown -->
+    <div class="mb-4">
+        <h4 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="fa-solid fa-sack-dollar text-warning me-2"></i> 4. Commercial Investment & Pricing Breakdown</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Item / Scope</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount (LKR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>System Development</strong></td>
+                        <td>Full Software Development (Web POS, SMS Module, Return Module, Mobile App Suite)</td>
+                        <td class="text-end fw-bold">Rs. 120,000.00</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hosting / Servers / Users</strong></td>
+                        <td>Cloud Server Setup, SSL, Database Hosting, Domain & Multi-User Licenses</td>
+                        <td class="text-end fw-bold">Rs. 35,000.00</td>
+                    </tr>
+                    <tr class="table-warning fw-bold fs-6">
+                        <td>TOTAL INVESTMENT</td>
+                        <td>Grand Total Project Commercial Investment</td>
+                        <td class="text-end text-success">Rs. 155,000.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5 pt-3 border-top text-center text-muted text-xs">
+        <p class="mb-0">This proposal document is prepared for client review and strategic planning. Codebase updates will commence upon client sign-off.</p>
+    </div>
+</div>
+
+</body>
+</html>

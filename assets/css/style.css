@@ -1,0 +1,367 @@
+/* Custom Bakery Management Styling */
+
+:root {
+    --bakery-primary: #d97724;
+    --bakery-primary-dark: #b25310;
+    --bakery-secondary: #8c4a27;
+    --bakery-bg: #fdf8f5;
+    --bakery-card-bg: #ffffff;
+    --bakery-sidebar-bg: #2c221e;
+    --bakery-sidebar-active: #d97724;
+    --bakery-text: #4a3b32;
+    --bakery-muted: #8d7a6e;
+}
+
+body {
+    background-color: var(--bakery-bg);
+    color: var(--bakery-text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sidebar & Navigation */
+#wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    min-height: 100vh;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: var(--bakery-sidebar-bg);
+    color: #f1e9e3;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar .sidebar-brand {
+    padding: 24px 20px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#sidebar ul.components {
+    padding: 15px 0;
+}
+
+#sidebar ul li a {
+    padding: 13px 22px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #cfc2ba;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+    border-left: 4px solid transparent;
+}
+
+#sidebar ul li a:hover, #sidebar ul li.active a {
+    color: #ffffff;
+    background: rgba(217, 119, 36, 0.18);
+    border-left-color: var(--bakery-primary);
+}
+
+#sidebar ul li a i {
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+#content {
+    width: 100%;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-navbar {
+    background: #ffffff;
+    border-bottom: 1px solid #ebdcd3;
+    padding: 14px 28px;
+}
+
+.main-container {
+    padding: 28px;
+    flex: 1;
+}
+
+/* Custom Cards */
+.card-bakery {
+    background: var(--bakery-card-bg);
+    border: 1px solid #ebdcd3;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(140, 74, 39, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-bakery:hover {
+    box-shadow: 0 6px 20px rgba(140, 74, 39, 0.08);
+}
+
+.stat-card {
+    border-radius: 14px;
+    padding: 18px 20px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    height: 145px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-card h6 {
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+}
+
+.stat-card .stat-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-card .stat-icon {
+    position: absolute;
+    right: 18px;
+    bottom: 12px;
+    font-size: 3.5rem;
+    opacity: 0.18;
+}
+
+.bg-bakery-orange { background: linear-gradient(135deg, #e67e22, #d35400); }
+.bg-bakery-chocolate { background: linear-gradient(135deg, #795548, #4e342e); }
+.bg-bakery-cream { background: linear-gradient(135deg, #f39c12, #e67e22); }
+.bg-bakery-teal { background: linear-gradient(135deg, #16a085, #1abc9c); }
+
+/* POS Layout */
+.product-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--bakery-primary);
+    box-shadow: 0 6px 16px rgba(217, 119, 36, 0.2);
+}
+
+.product-card img {
+    height: 110px;
+    object-fit: cover;
+    width: 100%;
+    background: #fdf5f0;
+}
+
+.product-card .card-body {
+    padding: 12px;
+}
+
+/* POS Layout Upgrades */
+.pos-cart-container {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #ebdcd3;
+    height: calc(100vh - 105px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pos-cart-items {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 6px 12px;
+    background: #ffffff;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pos-cart-items::-webkit-scrollbar,
+.pos-products-grid::-webkit-scrollbar,
+.pos-cat-pills::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+.pos-cart-items::-webkit-scrollbar-track,
+.pos-products-grid::-webkit-scrollbar-track,
+.pos-cat-pills::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.pos-cart-items::-webkit-scrollbar-thumb,
+.pos-products-grid::-webkit-scrollbar-thumb,
+.pos-cat-pills::-webkit-scrollbar-thumb {
+    background: #d4c5b9;
+    border-radius: 4px;
+}
+
+.pos-cart-items::-webkit-scrollbar-thumb:hover,
+.pos-products-grid::-webkit-scrollbar-thumb:hover,
+.pos-cat-pills::-webkit-scrollbar-thumb:hover {
+    background: #b29f90;
+}
+
+.pos-cart-row {
+    transition: background-color 0.15s ease;
+}
+
+.pos-cart-row:hover {
+    background-color: #fdfbf9;
+}
+
+.pos-cart-footer {
+    border-top: 1px solid #ebdcd3;
+    padding: 10px 14px;
+    background: #faf6f2;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    flex-shrink: 0;
+}
+
+/* Category Filter Pills */
+.pos-cat-pills {
+    scrollbar-width: thin;
+}
+
+.category-pill {
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 30px;
+    background: #f0e6df;
+    color: #5c493e;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.category-pill.active, .category-pill:hover {
+    background: var(--bakery-primary);
+    color: #ffffff;
+}
+
+/* Receipt Print Styling */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #printableReceipt, #printableReceipt * {
+        visibility: visible;
+    }
+    #printableReceipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+    }
+}
+
+/* ==========================================================================
+   Responsive Mobile Navigation & Layout Upgrades
+   ========================================================================== */
+
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1040;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: -270px;
+        height: 100vh;
+        z-index: 1050;
+        min-width: 270px;
+        max-width: 270px;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.35);
+        transition: left 0.3s ease;
+        overflow-y: auto;
+    }
+
+    #sidebar.active {
+        left: 0;
+    }
+
+    #content {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .top-navbar {
+        padding: 10px 14px;
+    }
+
+    .main-container {
+        padding: 14px;
+    }
+
+    .card-bakery {
+        padding: 16px !important;
+        border-radius: 12px;
+    }
+
+    /* Stat Cards adjustments */
+    .stat-card {
+        height: auto !important;
+        min-height: 105px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card .stat-icon {
+        font-size: 2.4rem;
+        right: 12px;
+        bottom: 8px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.35rem;
+    }
+
+    /* POS adjustments for mobile/tablet */
+    .pos-cart-container {
+        height: auto;
+        min-height: 400px;
+        margin-top: 15px;
+    }
+
+    /* Smooth touch scrolling for tables */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 1rem;
+    }
+}
+

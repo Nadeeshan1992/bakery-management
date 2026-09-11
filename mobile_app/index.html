@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bakery Sales Person Mobile App</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background-color: #eef2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 420px;
+            height: 90vh;
+            max-height: 850px;
+            background: #ffffff;
+            border-radius: 36px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            border: 10px solid #222222;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media (max-width: 576px) {
+            body {
+                background-color: #ffffff;
+                align-items: stretch;
+            }
+            .phone-frame {
+                max-width: 100%;
+                height: 100vh;
+                max-height: 100vh;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+
+        .phone-header {
+            background: linear-gradient(135deg, #d97724, #8c4a27);
+            color: #ffffff;
+            padding: 18px 16px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .phone-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #fdf8f5;
+        }
+
+        .phone-footer {
+            background: #ffffff;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .nav-tab-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 0.68rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            flex: 1;
+            padding: 4px 2px;
+            white-space: nowrap;
+        }
+
+        .nav-tab-btn.active {
+            color: #d97724;
+            font-weight: bold;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: #ffffff;
+            margin-bottom: 14px;
+        }
+
+        .badge-role {
+            background-color: #d97724;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .credit-banner {
+            background: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.8rem;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Constrain SweetAlert inside the mobile phone frame */
+        .phone-frame .swal2-container {
+            position: absolute !important;
+            border-radius: 26px;
+        }
+
+        .phone-frame .swal2-popup {
+            font-size: 0.82rem !important;
+            width: 88% !important;
+            max-width: 320px !important;
+            padding: 1rem !important;
+            border-radius: 20px !important;
+        }
+
+        .phone-frame .swal2-title {
+            font-size: 1.05rem !important;
+            padding-top: 0.5rem !important;
+        }
+
+        .phone-frame .swal2-html-container {
+            font-size: 0.8rem !important;
+            margin: 0.5rem 0 !important;
+        }
+
+        .phone-frame .swal2-actions {
+            margin-top: 0.75rem !important;
+        }
+
+        .phone-frame .swal2-styled {
+            font-size: 0.8rem !important;
+            padding: 6px 16px !important;
+            border-radius: 10px !important;
+        }
+
+        .phone-frame .swal2-icon {
+            transform: scale(0.75);
+            margin: 0.5rem auto 0 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <!-- Header -->
+    <div class="phone-header">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-cake-candles fs-5"></i>
+            <div>
+                <strong class="d-block text-white" style="font-size: 0.95rem;">MLB Sales Mobile</strong>
+                <small class="text-white-50" style="font-size: 0.7rem;" id="headerUserSub">Sales Person Portal</small>
+            </div>
+        </div>
+        <span class="badge-role" id="headerUserBadge">Sales</span>
+    </div>
+
+    <!-- Body Container -->
+    <div class="phone-body">
+
+        <!-- SCREEN 1: LOGIN -->
+        <div id="screenLogin" class="screen active">
+            <div class="text-center my-4">
+                <img src="assets/images/mlb_logo.jpg" onerror="this.src='../assets/images/mlb_logo.jpg'; this.onerror=null;" style="height: 70px; border-radius: 12px; padding: 4px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <h5 class="fw-bold mt-3 text-dark">Sales Person Login</h5>
+                <p class="text-muted small">Log in to book pre-orders & check customer credit limits</p>
+            </div>
+
+            <div id="loginAlert" class="alert alert-danger py-2 text-xs" style="display: none;"></div>
+
+            <div class="card card-custom p-3">
+                <div class="mb-3">
+                    <label class="form-label text-xs fw-bold">Username</label>
+                    <input type="text" id="loginUsername" class="form-control form-control-sm" value="sales">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-xs fw-bold">Password</label>
+                    <input type="password" id="loginPassword" class="form-control form-control-sm" value="password123">
+                </div>
+                <button class="btn btn-warning text-dark fw-bold w-100 py-2 shadow-sm" onclick="doMobileLogin()">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i> Log In
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100 py-2 mt-2 text-xs fw-bold shadow-sm" onclick="startDemoMode()">
+                    <i class="fa-solid fa-play text-warning me-1"></i> Launch Client Test / Demo Mode
+                </button>
+                <div class="text-center mt-2">
+                    <small class="text-muted" style="font-size: 0.68rem;">Instant testing without server on Vercel</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: ORDERS DASHBOARD -->
+        <div id="screenOrders" class="screen">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-calendar-check text-warning me-1"></i> My Pre-Orders</h6>
+                <button class="btn btn-sm btn-warning text-dark fw-bold text-xs" onclick="openNewOrderScreen()">
+                    <i class="fa-solid fa-plus me-1"></i> Book Order
+                </button>
+            </div>
+
+            <div id="ordersListContainer">
+                <div class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-1"></i> Loading orders...</div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: CREATE ORDER -->
+        <div id="screenCreateOrder" class="screen">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-calendar-plus text-warning me-1"></i> Book New Pre-Order</h6>
+                <button class="btn btn-sm btn-outline-secondary" onclick="switchScreen('screenOrders')"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+
+            <!-- Customer Select -->
+            <div class="card card-custom p-3">
+                <label class="form-label text-xs fw-bold">Select Customer *</label>
+                <select id="custSelect" class="form-select form-select-sm" onchange="onCustSelectChange()">
+                    <option value="">-- Choose Customer --</option>
+                </select>
+
+                <!-- Customer Credit Banner -->
+                <div id="custCreditBanner" class="credit-banner mt-2" style="display: none;">
+                    <div class="d-flex justify-content-between">
+                        <span>Limit: <strong id="mbCreditLimit">Rs. 0.00</strong></span>
+                        <span>Due: <strong id="mbOutstanding" class="text-danger">Rs. 0.00</strong></span>
+                    </div>
+                    <div class="mt-1 border-top pt-1 text-success fw-bold">
+                        Available Credit: <span id="mbAvailable">Rs. 0.00</span>
+                    </div>
+                </div>
+
+                <div id="mbCreditAlert" class="alert alert-danger py-1 px-2 text-xs mt-2" style="display: none;">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Credit Limit Exceeded!
+                </div>
+            </div>
+
+            <!-- Items Selector -->
+            <div class="card card-custom p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-xs fw-bold text-dark"><i class="fa-solid fa-basket-shopping me-1 text-warning"></i> Add Products</span>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <select id="prodSelect" class="form-select form-select-sm">
+                            <option value="">-- Choose Product --</option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <input type="number" id="prodQtyInput" class="form-control form-control-sm text-center" value="1" min="1" step="1" placeholder="Qty">
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-sm btn-dark w-100 text-xs fw-bold" onclick="addMobileItem()">+ Add</button>
+                    </div>
+                </div>
+
+                <div id="cartItemsWrapper">
+                    <div class="text-muted text-center py-3 text-xs">No items added to cart yet.</div>
+                </div>
+            </div>
+
+            <!-- Returned Goods / Unsold Stock Return Card -->
+            <div class="card card-custom p-3 border-danger-subtle">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-xs fw-bold text-danger"><i class="fa-solid fa-rotate-left me-1"></i> Return Unsold Stock / Goods</span>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-5">
+                        <select id="returnProdSelect" class="form-select form-select-sm">
+                            <option value="">-- Return Item --</option>
+                        </select>
+                    </div>
+                    <div class="col-2 px-1">
+                        <input type="number" id="returnQtyInput" class="form-control form-control-sm text-center px-1" value="1" min="1" step="1" placeholder="Qty">
+                    </div>
+                    <div class="col-3 px-1">
+                        <select id="returnReasonSelect" class="form-select form-select-sm px-1 text-xs">
+                            <option value="over_order">Over Order</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger w-100 text-xs px-1 fw-bold" onclick="addMobileReturnItem()">+ Add</button>
+                    </div>
+                </div>
+
+                <div id="returnItemsWrapper">
+                    <div class="text-muted text-center py-2 text-xs">No returned goods added.</div>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="card card-custom p-3">
+                <div class="mb-2">
+                    <label class="form-label text-xs fw-bold">Advance Deposit Paid (Rs.)</label>
+                    <input type="number" id="mbPaidAmount" class="form-control form-control-sm" value="0.00" oninput="recalcMobileTotals()">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label text-xs fw-bold">Payment Method</label>
+                    <select id="mbPaymentMethod" class="form-select form-select-sm" onchange="toggleMbChequeRef()">
+                        <option value="cash" selected>Cash</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="online">Online Transfer</option>
+                    </select>
+                </div>
+                <div class="mb-2" id="mbChequeRefBox" style="display: none;">
+                    <label class="form-label text-xs fw-bold text-primary">Cheque Reference No. *</label>
+                    <input type="text" id="mbChequeRefInput" class="form-control form-control-sm border-primary" placeholder="e.g. CHQ-984712">
+                </div>
+
+                <div class="bg-light p-2 rounded border mt-2 text-xs">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Items Subtotal:</span><strong id="mbDispSubtotal">Rs. 0.00</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1 text-danger">
+                        <span>Discount:</span><strong id="mbDispDiscount">- Rs. 0.00</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1 text-danger">
+                        <span>Returned Credit:</span><strong id="mbDispReturnCredit">- Rs. 0.00</strong>
+                    </div>
+                    <div class="d-flex justify-content-between border-top pt-1 fw-bold fs-6 text-success">
+                        <span>Total Order Amount:</span><strong id="mbDispTotal">Rs. 0.00</strong>
+                    </div>
+                    <div class="d-flex justify-content-between text-primary fw-bold">
+                        <span>Balance Due:</span><strong id="mbDispBalance">Rs. 0.00</strong>
+                    </div>
+                </div>
+
+                <button id="mbSubmitBtn" class="btn btn-warning text-dark fw-bold w-100 py-2 mt-3 shadow-sm" onclick="submitMobileOrder()">
+                    <i class="fa-solid fa-check-circle me-1"></i> Complete Booking
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: CUSTOMERS DIRECTORY -->
+        <div id="screenCustomers" class="screen">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-users text-warning me-1"></i> Customers Directory</h6>
+                <button class="btn btn-sm btn-warning text-dark fw-bold text-xs" onclick="openCreateCustomerModal()">
+                    <i class="fa-solid fa-user-plus me-1"></i> Register New
+                </button>
+            </div>
+
+            <!-- Customer Search -->
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" id="custSearchInput" class="form-control" placeholder="Search customer name or phone..." oninput="filterMobileCustomers()">
+            </div>
+
+            <div id="customersListContainer">
+                <div class="text-center py-4 text-muted text-xs"><i class="fa-solid fa-spinner fa-spin me-1"></i> Loading customers...</div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: SALES REPORT -->
+        <div id="screenReports" class="screen">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-chart-line text-warning me-1"></i> My Sales Report</h6>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary text-xs active" onclick="setReportPreset('month', this)">This Month</button>
+                    <button class="btn btn-outline-secondary text-xs" onclick="setReportPreset('today', this)">Today</button>
+                </div>
+            </div>
+
+            <!-- Date Range Filters -->
+            <div class="card card-custom p-2 mb-3">
+                <div class="row g-2 text-xs">
+                    <div class="col-6">
+                        <label class="form-label mb-1 text-muted fw-bold">From Date</label>
+                        <input type="date" id="reportDateFrom" class="form-control form-control-sm text-xs" onchange="loadMobileSalesReport()">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mb-1 text-muted fw-bold">To Date</label>
+                        <input type="date" id="reportDateTo" class="form-control form-control-sm text-xs" onchange="loadMobileSalesReport()">
+                    </div>
+                </div>
+            </div>
+
+            <div id="reportContentContainer">
+                <div class="text-center py-4 text-muted text-xs"><i class="fa-solid fa-spinner fa-spin me-1"></i> Generating report...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="phone-footer" id="phoneFooter" style="display: none;">
+        <button class="nav-tab-btn active" id="tabBtnOrders" onclick="switchScreen('screenOrders')">
+            <i class="fa-solid fa-receipt fs-6"></i>
+            <span>Orders</span>
+        </button>
+        <button class="nav-tab-btn" id="tabBtnBook" onclick="openNewOrderScreen()">
+            <i class="fa-solid fa-plus-circle fs-6"></i>
+            <span>Book New</span>
+        </button>
+        <button class="nav-tab-btn" id="tabBtnCust" onclick="switchScreen('screenCustomers')">
+            <i class="fa-solid fa-users fs-6"></i>
+            <span>Customers</span>
+        </button>
+        <button class="nav-tab-btn" id="tabBtnReport" onclick="switchScreen('screenReports')">
+            <i class="fa-solid fa-chart-pie fs-6"></i>
+            <span>Sales Report</span>
+        </button>
+        <button class="nav-tab-btn" onclick="doMobileLogout()">
+            <i class="fa-solid fa-right-from-bracket fs-6"></i>
+            <span>Logout</span>
+        </button>
+    </div>
+</div>
+
+<script>
+let apiToken = '';
+let currentUserId = 0;
+let customerList = [];
+let productList = [];
+let mobileCart = [];
+let mobileReturnCart = [];
+let isDemoMode = (window.location.hostname.includes('vercel.app') || window.location.protocol === 'file:');
+
+// Sample Master Data for Instant Client Testing on Vercel
+const demoCustomers = [
+    {
+        id: 1,
+        title: 'Mr.',
+        name: 'David Miller',
+        full_display_name: 'Mr. David Miller',
+        phone: '0771234567',
+        address: 'No. 45, Galle Road, Colombo',
+        credit_limit: 50000.00,
+        total_outstanding: 15000.00,
+        available_credit: 35000.00,
+        discount_biscuits: 5.00,
+        discount_other: 2.00
+    },
+    {
+        id: 2,
+        title: 'Mr.',
+        name: 'Nanda Stores',
+        full_display_name: 'Mr. Nanda Stores',
+        phone: '0711234567',
+        address: 'Main Street, Kandy',
+        credit_limit: 100000.00,
+        total_outstanding: 42500.00,
+        available_credit: 57500.00,
+        discount_biscuits: 10.00,
+        discount_other: 5.00
+    },
+    {
+        id: 3,
+        title: 'Mrs.',
+        name: 'Emily Watson',
+        full_display_name: 'Mrs. Emily Watson',
+        phone: '0779876543',
+        address: 'Peradeniya, Kandy',
+        credit_limit: 30000.00,
+        total_outstanding: 5000.00,
+        available_credit: 25000.00,
+        discount_biscuits: 0.00,
+        discount_other: 0.00
+    },
+    {
+        id: 4,
+        title: 'Mr.',
+        name: 'Kamal Perera',
+        full_display_name: 'Mr. Kamal Perera',
+        phone: '0765544332',
+        address: 'Kurunegala',
+        credit_limit: 0.00,
+        total_outstanding: 0.00,
+        available_credit: 0.00,
+        discount_biscuits: 0.00,
+        discount_other: 0.00
+    }
+];
+
+const demoProducts = [
+    { id: 1, name: 'White Bread', effective_price: 120.00, current_stock: 50, category_name: 'Breads' },
+    { id: 2, name: 'Chocolate Danish', effective_price: 250.00, current_stock: 35, category_name: 'Breads' },
+    { id: 3, name: 'Flaky Butter Croissant', effective_price: 280.00, current_stock: 40, category_name: 'Breads' },
+    { id: 4, name: 'Cream Bun', effective_price: 100.00, current_stock: 25, category_name: 'Buns' },
+    { id: 5, name: 'Tea Bun', effective_price: 80.00, current_stock: 60, category_name: 'Buns' },
+    { id: 6, name: 'Choco Chip Cookie (Pack of 6)', effective_price: 350.00, current_stock: 20, category_name: 'Biscuits/Cookies' },
+    { id: 7, name: 'Milki Rice', effective_price: 200.00, current_stock: 15, category_name: 'Catering Range' }
+];
+
+let demoOrders = [
+    {
+        id: 101,
+        order_number: 'ORD-20260911-001',
+        customer_id: 1,
+        customer_name: 'Mr. David Miller',
+        total_amount: 3500.00,
+        paid_amount: 1000.00,
+        balance_due: 2500.00,
+        payment_status: 'partial',
+        order_status: 'pending',
+        payment_method: 'cash',
+        cheque_ref: null,
+        created_at: '2026-09-11 08:30:00'
+    },
+    {
+        id: 102,
+        order_number: 'ORD-20260910-045',
+        customer_id: 2,
+        customer_name: 'Mr. Nanda Stores',
+        total_amount: 6200.00,
+        paid_amount: 6200.00,
+        balance_due: 0.00,
+        payment_status: 'paid',
+        order_status: 'completed',
+        payment_method: 'cash',
+        cheque_ref: null,
+        created_at: '2026-09-10 14:15:00'
+    },
+    {
+        id: 103,
+        order_number: 'ORD-20260909-021',
+        customer_id: 3,
+        customer_name: 'Mrs. Emily Watson',
+        total_amount: 1850.00,
+        paid_amount: 0.00,
+        balance_due: 1850.00,
+        payment_status: 'unpaid',
+        order_status: 'pending',
+        payment_method: 'cheque',
+        cheque_ref: 'CHQ-581902',
+        created_at: '2026-09-09 11:20:00'
+    }
+];
+
+const API_BASE = '../api';
+const MobileSwal = Swal.mixin({ target: '.phone-frame' });
+
+async function fetchJson(url, options = {}) {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        const cleanText = text.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+        return {
+            success: false,
+            message: cleanText || `Server returned HTTP ${res.status}`
+        };
+    }
+}
+
+function startDemoMode() {
+    isDemoMode = true;
+    apiToken = 'demo-client-token';
+    currentUserId = 2;
+    document.getElementById('headerUserSub').innerText = 'John Sales (Demo Mode)';
+    document.getElementById('headerUserBadge').innerText = 'Demo';
+    document.getElementById('headerUserBadge').className = 'badge bg-warning text-dark';
+    document.getElementById('phoneFooter').style.display = 'flex';
+    switchScreen('screenOrders');
+    loadMasterData();
+}
+
+function switchScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+
+    const targetEl = document.getElementById(screenId);
+    if (targetEl) targetEl.classList.add('active');
+
+    if (screenId === 'screenOrders') {
+        document.getElementById('tabBtnOrders')?.classList.add('active');
+        loadMobileOrders();
+    } else if (screenId === 'screenCreateOrder') {
+        document.getElementById('tabBtnBook')?.classList.add('active');
+    } else if (screenId === 'screenCustomers') {
+        document.getElementById('tabBtnCust')?.classList.add('active');
+        renderMobileCustomersList();
+    } else if (screenId === 'screenReports') {
+        document.getElementById('tabBtnReport')?.classList.add('active');
+        loadMobileSalesReport();
+    }
+}
+
+async function doMobileLogin() {
+    const user = document.getElementById('loginUsername').value;
+    const pass = document.getElementById('loginPassword').value;
+    const alertBox = document.getElementById('loginAlert');
+    alertBox.style.display = 'none';
+
+    if (isDemoMode) {
+        startDemoMode();
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/auth/login.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            apiToken = data.data.api_token;
+            currentUserId = data.data.user_id;
+            document.getElementById('headerUserSub').innerText = data.data.full_name;
+            document.getElementById('phoneFooter').style.display = 'flex';
+            switchScreen('screenOrders');
+            loadMasterData();
+        } else {
+            alertBox.innerText = data.message || 'Login failed';
+            alertBox.style.display = 'block';
+        }
+    } catch (e) {
+        // Automatically switch to Demo Mode on Vercel or when backend is unreachable
+        console.log('Backend not detected, activating Demo Mode...', e);
+        startDemoMode();
+    }
+}
+
+function doMobileLogout() {
+    apiToken = '';
+    document.getElementById('phoneFooter').style.display = 'none';
+    document.getElementById('headerUserSub').innerText = 'Sales Person Portal';
+    document.getElementById('headerUserBadge').innerText = 'Sales';
+    document.getElementById('headerUserBadge').className = 'badge-role';
+    switchScreen('screenLogin');
+}
+
+async function loadMasterData() {
+    if (isDemoMode) {
+        if (customerList.length === 0) customerList = JSON.parse(JSON.stringify(demoCustomers));
+        if (productList.length === 0) productList = JSON.parse(JSON.stringify(demoProducts));
+        populateCustDropdown();
+        populateProdDropdown();
+        renderMobileCustomersList();
+        return;
+    }
+
+    try {
+        const [custRes, prodRes] = await Promise.all([
+            fetch(`${API_BASE}/customers/list.php`, { headers: { 'X-API-Token': apiToken } }),
+            fetch(`${API_BASE}/products/list.php`, { headers: { 'X-API-Token': apiToken } })
+        ]);
+        const custData = await custRes.json();
+        const prodData = await prodRes.json();
+
+        if (custData.success) {
+            customerList = custData.data;
+            populateCustDropdown();
+            renderMobileCustomersList();
+        }
+        if (prodData.success) {
+            productList = prodData.data;
+            populateProdDropdown();
+        }
+    } catch (e) {
+        console.warn('Error loading master data, fallback to demo', e);
+        if (customerList.length === 0) customerList = JSON.parse(JSON.stringify(demoCustomers));
+        if (productList.length === 0) productList = JSON.parse(JSON.stringify(demoProducts));
+        populateCustDropdown();
+        populateProdDropdown();
+        renderMobileCustomersList();
+    }
+}
+
+function populateCustDropdown() {
+    const sel = document.getElementById('custSelect');
+    sel.innerHTML = '<option value="">-- Choose Customer --</option>';
+    customerList.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.full_display_name} (${c.phone || 'N/A'})</option>`;
+    });
+}
+
+function populateProdDropdown() {
+    const sel = document.getElementById('prodSelect');
+    sel.innerHTML = '<option value="">-- Choose Product --</option>';
+    productList.forEach(p => {
+        const stockLabel = (p.current_stock > 0) ? `Stock: ${p.current_stock}` : 'OUT OF STOCK';
+        sel.innerHTML += `<option value="${p.id}">${p.name} - Rs. ${p.effective_price.toFixed(2)} (${stockLabel})</option>`;
+    });
+    populateReturnProdDropdown();
+}
+
+function populateReturnProdDropdown() {
+    const sel = document.getElementById('returnProdSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- Return Item --</option>';
+    productList.forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.name} - Rs. ${p.effective_price.toFixed(2)}</option>`;
+    });
+}
+
+function onCustSelectChange() {
+    const custId = parseInt(document.getElementById('custSelect').value || 0);
+    const banner = document.getElementById('custCreditBanner');
+    const cust = customerList.find(c => c.id === custId);
+
+    if (cust && cust.credit_limit > 0) {
+        banner.style.display = 'block';
+        document.getElementById('mbCreditLimit').innerText = 'Rs. ' + cust.credit_limit.toFixed(2);
+        document.getElementById('mbOutstanding').innerText = 'Rs. ' + cust.total_outstanding.toFixed(2);
+        document.getElementById('mbAvailable').innerText = 'Rs. ' + cust.available_credit.toFixed(2);
+    } else {
+        banner.style.display = 'none';
+    }
+    recalcMobileTotals();
+}
+
+function toggleMbChequeRef() {
+    const method = document.getElementById('mbPaymentMethod').value;
+    const box = document.getElementById('mbChequeRefBox');
+    box.style.display = (method === 'cheque' || method === 'online') ? 'block' : 'none';
+}
+
+function addMobileItem() {
+    const prodId = parseInt(document.getElementById('prodSelect').value || 0);
+    const qtyInput = document.getElementById('prodQtyInput');
+    const qtyToAdd = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+    if (!prodId || qtyToAdd < 1) return;
+
+    const prod = productList.find(p => p.id === prodId);
+    if (!prod) return;
+
+    const existing = mobileCart.find(item => item.product_id === prodId);
+    const currentQtyInCart = existing ? existing.qty : 0;
+    const requestedTotalQty = currentQtyInCart + qtyToAdd;
+
+    if (requestedTotalQty > prod.current_stock) {
+        MobileSwal.fire({
+            icon: 'error',
+            title: 'Out of Stock!',
+            html: `Cannot add item <strong>"${prod.name}"</strong>: Item is OUT OF STOCK!<br><span class="text-muted small">(Available: ${prod.current_stock} pcs, Requested: ${requestedTotalQty} pcs)</span>`,
+            confirmButtonColor: '#d97724'
+        });
+        return;
+    }
+
+    if (existing) {
+        existing.qty += qtyToAdd;
+    } else {
+        mobileCart.push({
+            product_id: prod.id,
+            name: prod.name,
+            price: prod.effective_price,
+            category_name: prod.category_name,
+            qty: qtyToAdd
+        });
+    }
+    if (qtyInput) qtyInput.value = 1;
+    renderMobileCart();
+}
+
+function updateMobileCartQty(index, newQty) {
+    const qty = parseInt(newQty);
+    if (isNaN(qty) || qty <= 0) {
+        removeMobileCartItem(index);
+    } else {
+        const item = mobileCart[index];
+        const prod = productList.find(p => p.id === item.product_id);
+        if (prod && qty > prod.current_stock) {
+            MobileSwal.fire({
+                icon: 'error',
+                title: 'Stock Limit Exceeded!',
+                html: `Cannot update quantity for <strong>"${item.name}"</strong>!<br><span class="text-muted small">(Available: ${prod.current_stock} pcs, Requested: ${qty} pcs)</span>`,
+                confirmButtonColor: '#d97724'
+            });
+            renderMobileCart();
+            return;
+        }
+        mobileCart[index].qty = qty;
+        renderMobileCart();
+    }
+}
+
+function renderMobileCart() {
+    const wrapper = document.getElementById('cartItemsWrapper');
+    if (mobileCart.length === 0) {
+        wrapper.innerHTML = '<div class="text-muted text-center py-3 text-xs">No items added to cart yet.</div>';
+        recalcMobileTotals();
+        return;
+    }
+
+    let html = '';
+    mobileCart.forEach((item, index) => {
+        const itemSub = item.price * item.qty;
+        html += `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2 text-xs">
+                <div style="flex: 1; min-width: 0;" class="pe-2">
+                    <strong class="text-truncate d-block">${item.name}</strong>
+                    <div class="text-muted">Rs. ${item.price.toFixed(2)} each</div>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <div class="input-group input-group-sm" style="width: 105px;">
+                        <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="updateMobileCartQty(${index}, ${item.qty - 1})">-</button>
+                        <input type="number" class="form-control px-1 text-center text-xs py-0" value="${item.qty}" min="1" onchange="updateMobileCartQty(${index}, this.value)" oninput="updateMobileCartQty(${index}, this.value)">
+                        <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="updateMobileCartQty(${index}, ${item.qty + 1})">+</button>
+                    </div>
+                    <strong class="text-success ms-1" style="min-width: 60px; text-align: right;">Rs. ${itemSub.toFixed(2)}</strong>
+                    <button class="btn btn-sm btn-outline-danger p-0 px-1 ms-1" onclick="removeMobileCartItem(${index})">&times;</button>
+                </div>
+            </div>`;
+    });
+    wrapper.innerHTML = html;
+    recalcMobileTotals();
+}
+
+function removeMobileCartItem(index) {
+    mobileCart.splice(index, 1);
+    renderMobileCart();
+}
+
+function addMobileReturnItem() {
+    const prodId = parseInt(document.getElementById('returnProdSelect').value || 0);
+    const qtyInput = document.getElementById('returnQtyInput');
+    const reasonSelect = document.getElementById('returnReasonSelect');
+    const qtyToAdd = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+    const reason = reasonSelect ? reasonSelect.value : 'over_order';
+
+    if (!prodId || qtyToAdd < 1) return;
+
+    const prod = productList.find(p => p.id === prodId);
+    if (!prod) return;
+
+    const existing = mobileReturnCart.find(item => item.product_id === prodId && item.reason === reason);
+    if (existing) {
+        existing.quantity += qtyToAdd;
+    } else {
+        mobileReturnCart.push({
+            product_id: prod.id,
+            name: prod.name,
+            price: prod.effective_price,
+            quantity: qtyToAdd,
+            reason: reason
+        });
+    }
+
+    if (qtyInput) qtyInput.value = 1;
+    renderMobileReturnCart();
+}
+
+function renderMobileReturnCart() {
+    const wrapper = document.getElementById('returnItemsWrapper');
+    if (!wrapper) return;
+
+    if (mobileReturnCart.length === 0) {
+        wrapper.innerHTML = '<div class="text-muted text-center py-2 text-xs">No returned goods added.</div>';
+        recalcMobileTotals();
+        return;
+    }
+
+    let html = '';
+    mobileReturnCart.forEach((item, index) => {
+        const itemCredit = item.price * item.quantity;
+        const reasonBadge = (item.reason === 'expired') 
+            ? '<span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1 text-xs">Expired</span>' 
+            : '<span class="badge bg-warning-subtle text-dark border border-warning-subtle ms-1 text-xs">Over Order</span>';
+        
+        html += `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2 text-xs">
+                <div style="flex: 1; min-width: 0;" class="pe-2">
+                    <strong class="text-truncate d-block text-danger">${item.name} ${reasonBadge}</strong>
+                    <div class="text-muted">${item.quantity} pcs @ Rs. ${item.price.toFixed(2)}</div>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <strong class="text-danger me-2">- Rs. ${itemCredit.toFixed(2)}</strong>
+                    <button class="btn btn-sm btn-outline-danger p-0 px-1" onclick="removeMobileReturnItem(${index})">&times;</button>
+                </div>
+            </div>`;
+    });
+    wrapper.innerHTML = html;
+    recalcMobileTotals();
+}
+
+function removeMobileReturnItem(index) {
+    mobileReturnCart.splice(index, 1);
+    renderMobileReturnCart();
+}
+
+function recalcMobileTotals() {
+    let grandSub = 0;
+    let autoDiscount = 0;
+
+    const custId = parseInt(document.getElementById('custSelect').value || 0);
+    const cust = customerList.find(c => c.id === custId);
+    const discBisc = cust ? cust.discount_biscuits : 0;
+    const discOther = cust ? cust.discount_other : 0;
+
+    mobileCart.forEach(item => {
+        const gross = item.price * item.qty;
+        grandSub += gross;
+        const cat = (item.category_name || '').toLowerCase();
+        let rate = (cat.includes('biscuit') || cat.includes('cookie')) ? discBisc : discOther;
+        if (rate > 0) {
+            autoDiscount += (gross * rate) / 100;
+        }
+    });
+
+    let totalReturnCredit = 0;
+    mobileReturnCart.forEach(item => {
+        totalReturnCredit += (item.price * item.quantity);
+    });
+
+    const paid = parseFloat(document.getElementById('mbPaidAmount').value || 0);
+    const total = Math.max(0, grandSub - autoDiscount - totalReturnCredit);
+    const balDue = Math.max(0, total - paid);
+
+    document.getElementById('mbDispSubtotal').innerText = 'Rs. ' + grandSub.toFixed(2);
+    document.getElementById('mbDispDiscount').innerText = '- Rs. ' + autoDiscount.toFixed(2);
+    document.getElementById('mbDispReturnCredit').innerText = '- Rs. ' + totalReturnCredit.toFixed(2);
+    document.getElementById('mbDispTotal').innerText = 'Rs. ' + total.toFixed(2);
+    document.getElementById('mbDispBalance').innerText = 'Rs. ' + balDue.toFixed(2);
+
+    const alertBox = document.getElementById('mbCreditAlert');
+    const submitBtn = document.getElementById('mbSubmitBtn');
+
+    if (cust && cust.credit_limit > 0 && balDue > cust.available_credit) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> Balance due (Rs. ${balDue.toFixed(2)}) exceeds Available Credit (Rs. ${cust.available_credit.toFixed(2)})`;
+        submitBtn.disabled = true;
+    } else {
+        alertBox.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+}
+
+async function submitMobileOrder() {
+    const custId = parseInt(document.getElementById('custSelect').value || 0);
+    if (!custId || mobileCart.length === 0) {
+        MobileSwal.fire({
+            icon: 'warning',
+            title: 'Incomplete Order',
+            text: 'Please select a customer and add items to the cart.',
+            confirmButtonColor: '#d97724'
+        });
+        return;
+    }
+
+    const paid = parseFloat(document.getElementById('mbPaidAmount').value || 0);
+    const method = document.getElementById('mbPaymentMethod').value;
+    const chqRef = document.getElementById('mbChequeRefInput').value;
+
+    if (method === 'cheque' && !chqRef) {
+        MobileSwal.fire({
+            icon: 'warning',
+            title: 'Cheque Reference Required',
+            text: 'Please enter Cheque Reference Number.',
+            confirmButtonColor: '#d97724'
+        });
+        return;
+    }
+
+    if (isDemoMode) {
+        let grandSub = 0;
+        let autoDiscount = 0;
+        const cust = customerList.find(c => c.id === custId);
+        const discBisc = cust ? (cust.discount_biscuits || 0) : 0;
+        const discOther = cust ? (cust.discount_other || 0) : 0;
+
+        mobileCart.forEach(item => {
+            const gross = item.price * item.qty;
+            grandSub += gross;
+            const cat = (item.category_name || '').toLowerCase();
+            const rate = (cat.includes('biscuit') || cat.includes('cookie')) ? discBisc : discOther;
+            if (rate > 0) {
+                autoDiscount += (gross * rate) / 100;
+            }
+            const p = productList.find(pr => pr.id === item.product_id);
+            if (p) {
+                p.current_stock = Math.max(0, p.current_stock - item.qty);
+            }
+        });
+
+        let totalReturnCredit = 0;
+        mobileReturnCart.forEach(item => {
+            totalReturnCredit += (item.price * item.quantity);
+        });
+
+        const total = Math.max(0, grandSub - autoDiscount - totalReturnCredit);
+        const balDue = Math.max(0, total - paid);
+        const pStatus = balDue <= 0 ? 'paid' : (paid > 0 ? 'partial' : 'unpaid');
+        const newOrderNum = 'ORD-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + String(demoOrders.length + 1).padStart(3, '0');
+        const nowFormatted = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+        if (cust) {
+            cust.total_outstanding = (cust.total_outstanding || 0) + balDue;
+            cust.available_credit = Math.max(0, cust.credit_limit - cust.total_outstanding);
+        }
+
+        const newOrder = {
+            id: Date.now(),
+            order_number: newOrderNum,
+            customer_id: custId,
+            customer_name: cust ? (cust.full_display_name || cust.name) : 'Customer',
+            total_amount: total,
+            paid_amount: paid,
+            balance_due: balDue,
+            payment_status: pStatus,
+            order_status: 'pending',
+            payment_method: method,
+            cheque_ref: chqRef || null,
+            created_at: nowFormatted
+        };
+
+        demoOrders.unshift(newOrder);
+
+        MobileSwal.fire({
+            icon: 'success',
+            title: 'Order Booked!',
+            html: `Pre-Order <strong>${newOrderNum}</strong> booked successfully!<br><div class="mt-2 text-start p-2 bg-light rounded text-xs"><i class="fa-solid fa-comment-sms text-primary me-1"></i><strong>SMS Dispatched:</strong> To ${cust ? cust.phone : 'Customer'}: <em>"Your pre-order #${newOrderNum} for Rs.${total.toFixed(2)} is received. Paid: Rs.${paid.toFixed(2)}. Thank you!"</em></div>`,
+            confirmButtonColor: '#d97724'
+        });
+
+        mobileCart = [];
+        mobileReturnCart = [];
+        document.getElementById('custSelect').value = '';
+        document.getElementById('mbPaidAmount').value = '0.00';
+        document.getElementById('mbChequeRefInput').value = '';
+        onCustSelectChange();
+        renderMobileCart();
+        renderMobileReturnCart();
+        populateProdDropdown();
+        switchScreen('screenOrders');
+        return;
+    }
+
+    const payload = {
+        customer_id: custId,
+        items: mobileCart,
+        returned_items: mobileReturnCart,
+        paid_amount: paid,
+        payment_method: method,
+        cheque_ref: chqRef
+    };
+
+    try {
+        const res = await fetch(`${API_BASE}/orders/create.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Token': apiToken
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            MobileSwal.fire({
+                icon: 'success',
+                title: 'Order Booked!',
+                text: data.message,
+                confirmButtonColor: '#d97724'
+            });
+            mobileCart = [];
+            mobileReturnCart = [];
+            document.getElementById('custSelect').value = '';
+            document.getElementById('mbPaidAmount').value = '0.00';
+            document.getElementById('mbChequeRefInput').value = '';
+            onCustSelectChange();
+            renderMobileCart();
+            renderMobileReturnCart();
+            switchScreen('screenOrders');
+        } else {
+            MobileSwal.fire({
+                icon: 'error',
+                title: 'Booking Error',
+                text: data.message,
+                confirmButtonColor: '#d97724'
+            });
+        }
+    } catch (e) {
+        MobileSwal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: e.message,
+            confirmButtonColor: '#d97724'
+        });
+    }
+}
+
+function renderOrdersList(orders) {
+    const wrapper = document.getElementById('ordersListContainer');
+    if (!orders || orders.length === 0) {
+        wrapper.innerHTML = '<div class="text-center py-4 text-muted text-xs">No orders booked yet.</div>';
+        return;
+    }
+
+    let html = '';
+    orders.forEach(o => {
+        const isPaid = o.payment_status === 'paid' || o.balance_due <= 0;
+        const payBadgeClass = isPaid ? 'bg-success' : (o.payment_status === 'partial' ? 'bg-warning text-dark' : 'bg-danger');
+        const payStatusText = isPaid ? 'PAID' : (o.payment_status === 'partial' ? 'PARTIAL' : 'UNPAID');
+        const safeCustName = (o.customer_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+        html += `
+            <div class="card card-custom p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="text-dark">${o.order_number}</strong>
+                    <div>
+                        <span class="badge ${payBadgeClass} text-uppercase me-1" style="font-size:0.65rem;">${payStatusText}</span>
+                        <span class="badge bg-secondary text-uppercase" style="font-size:0.65rem;">${o.order_status}</span>
+                    </div>
+                </div>
+                <div class="text-xs text-muted mb-1"><i class="fa-solid fa-user me-1"></i> ${o.customer_name}</div>
+                ${o.cheque_ref ? `<div class="text-xs text-primary mb-1"><i class="fa-solid fa-money-check me-1"></i> Ref: ${o.cheque_ref}</div>` : ''}
+                
+                <div class="d-flex justify-content-between align-items-center text-xs mt-2 border-top pt-2">
+                    <div>
+                        <div>Total: <strong class="text-dark">Rs. ${parseFloat(o.total_amount).toFixed(2)}</strong></div>
+                        <div>Paid: <strong class="text-success">Rs. ${parseFloat(o.paid_amount).toFixed(2)}</strong></div>
+                    </div>
+                    <div class="text-end">
+                        <div class="mb-1">Due: <strong class="text-danger">Rs. ${parseFloat(o.balance_due).toFixed(2)}</strong></div>
+                        ${!isPaid ? `
+                            <button class="btn btn-sm btn-success fw-bold text-xs px-2 py-1 shadow-sm" onclick="openSettleModal(${o.id}, '${o.order_number}', '${safeCustName}', ${o.total_amount}, ${o.paid_amount}, ${o.balance_due})">
+                                <i class="fa-solid fa-hand-holding-dollar me-1"></i> Settle
+                            </button>
+                        ` : '<span class="text-success text-xs fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Settled</span>'}
+                    </div>
+                </div>
+            </div>`;
+    });
+    wrapper.innerHTML = html;
+}
+
+async function loadMobileOrders() {
+    const wrapper = document.getElementById('ordersListContainer');
+    if (isDemoMode) {
+        renderOrdersList(demoOrders);
+        return;
+    }
+    try {
+        const res = await fetch(`${API_BASE}/orders/list.php`, {
+            headers: { 'X-API-Token': apiToken }
+        });
+        const data = await res.json();
+
+        if (data.success && data.data && data.data.length > 0) {
+            renderOrdersList(data.data);
+        } else {
+            wrapper.innerHTML = '<div class="text-center py-4 text-muted text-xs">No orders booked yet.</div>';
+        }
+    } catch (e) {
+        console.warn('Backend unavailable, displaying demo orders', e);
+        renderOrdersList(demoOrders);
+    }
+}
+
+function openSettleModal(orderId, orderNum, customerName, totalAmt, paidAmt, balDue) {
+    MobileSwal.fire({
+        title: `<div style="font-size:1.05rem;" class="fw-bold text-dark"><i class="fa-solid fa-hand-holding-dollar text-success me-1"></i> Settle Order #${orderNum}</div>`,
+        html: `
+            <div class="text-start text-xs mb-3 p-2 bg-light rounded border">
+                <div class="mb-1"><strong>Customer:</strong> ${customerName}</div>
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Total Amount:</span> <strong>Rs. ${parseFloat(totalAmt).toFixed(2)}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1 text-success">
+                    <span>Paid So Far:</span> <strong>Rs. ${parseFloat(paidAmt).toFixed(2)}</strong>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-1 text-danger fw-bold fs-6">
+                    <span>Remaining Balance Due:</span> <span>Rs. ${parseFloat(balDue).toFixed(2)}</span>
+                </div>
+            </div>
+            <div class="text-start mb-2">
+                <label class="form-label text-xs fw-bold mb-1">Settlement Amount (Rs.) *</label>
+                <input type="number" id="swalSettleAmt" class="form-control form-control-sm fw-bold text-success fs-6" value="${parseFloat(balDue).toFixed(2)}" max="${parseFloat(balDue)}" step="0.01">
+            </div>
+            <div class="text-start mb-2">
+                <label class="form-label text-xs fw-bold mb-1">Payment Method</label>
+                <select id="swalSettleMethod" class="form-select form-select-sm">
+                    <option value="cash" selected>Cash</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="online">Online Transfer</option>
+                </select>
+            </div>
+            <div class="text-start mb-2" id="swalChequeBox" style="display:none;">
+                <label class="form-label text-xs fw-bold mb-1 text-primary">Cheque Reference No. *</label>
+                <input type="text" id="swalChequeRef" class="form-control form-control-sm border-primary" placeholder="e.g. CHQ-984712">
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-check me-1"></i> Confirm Settlement',
+        confirmButtonColor: '#198754',
+        cancelButtonText: 'Cancel',
+        didOpen: () => {
+            const methodSelect = document.getElementById('swalSettleMethod');
+            methodSelect.addEventListener('change', () => {
+                const chqBox = document.getElementById('swalChequeBox');
+                chqBox.style.display = (methodSelect.value === 'cheque' || methodSelect.value === 'online') ? 'block' : 'none';
+            });
+        },
+        preConfirm: () => {
+            const amt = parseFloat(document.getElementById('swalSettleAmt').value || 0);
+            const method = document.getElementById('swalSettleMethod').value;
+            const ref = document.getElementById('swalChequeRef').value.trim();
+
+            if (amt <= 0) {
+                Swal.showValidationMessage('Please enter a valid settlement amount (> Rs. 0)');
+                return false;
+            }
+            if (amt > parseFloat(balDue) + 0.01) {
+                Swal.showValidationMessage(`Settlement amount (Rs. ${amt.toFixed(2)}) cannot exceed balance due (Rs. ${parseFloat(balDue).toFixed(2)})`);
+                return false;
+            }
+            if (method === 'cheque' && !ref) {
+                Swal.showValidationMessage('Cheque Reference Number is required for cheque payments');
+                return false;
+            }
+            return { order_id: orderId, payment_amount: amt, payment_method: method, cheque_ref: ref };
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed && result.value) {
+            if (isDemoMode) {
+                const o = demoOrders.find(ord => ord.id === orderId || ord.order_number === orderNum);
+                if (o) {
+                    o.paid_amount += result.value.payment_amount;
+                    o.balance_due = Math.max(0, o.total_amount - o.paid_amount);
+                    o.payment_status = (o.balance_due <= 0) ? 'paid' : 'partial';
+                    if (result.value.cheque_ref) {
+                        o.cheque_ref = result.value.cheque_ref;
+                    }
+                    const cust = customerList.find(c => c.id === o.customer_id);
+                    if (cust) {
+                        cust.total_outstanding = Math.max(0, (cust.total_outstanding || 0) - result.value.payment_amount);
+                        cust.available_credit = Math.min(cust.credit_limit, Math.max(0, cust.credit_limit - cust.total_outstanding));
+                    }
+                }
+                MobileSwal.fire({
+                    icon: 'success',
+                    title: 'Settlement Complete!',
+                    html: `Payment of <strong>Rs. ${result.value.payment_amount.toFixed(2)}</strong> recorded successfully!<br><div class="mt-2 text-start p-2 bg-light rounded text-xs"><i class="fa-solid fa-comment-sms text-primary me-1"></i><strong>SMS Dispatched:</strong> To Customer: <em>"Payment of Rs.${result.value.payment_amount.toFixed(2)} received for #${orderNum}. Thank you!"</em></div>`,
+                    confirmButtonColor: '#d97724'
+                });
+                loadMobileOrders();
+                return;
+            }
+
+            try {
+                const data = await fetchJson(`${API_BASE}/orders/settle.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Token': apiToken
+                    },
+                    body: JSON.stringify(result.value)
+                });
+                if (data.success) {
+                    MobileSwal.fire({
+                        icon: 'success',
+                        title: 'Settlement Complete!',
+                        text: data.message,
+                        confirmButtonColor: '#d97724'
+                    });
+                    loadMobileOrders();
+                } else {
+                    MobileSwal.fire({
+                        icon: 'error',
+                        title: 'Settlement Failed',
+                        text: data.message,
+                        confirmButtonColor: '#d97724'
+                    });
+                }
+            } catch (e) {
+                MobileSwal.fire({
+                    icon: 'error',
+                    title: 'Network Error',
+                    text: e.message,
+                    confirmButtonColor: '#d97724'
+                });
+            }
+        }
+    });
+}
+
+function renderMobileCustomersList(filterQuery = '') {
+    const wrapper = document.getElementById('customersListContainer');
+    if (!customerList || customerList.length === 0) {
+        wrapper.innerHTML = '<div class="text-center py-4 text-muted text-xs">No customers registered yet.</div>';
+        return;
+    }
+
+    const q = filterQuery.toLowerCase().trim();
+    const filtered = customerList.filter(c => {
+        const name = (c.full_display_name || c.name || '').toLowerCase();
+        const phone = (c.phone || '').toLowerCase();
+        return name.includes(q) || phone.includes(q);
+    });
+
+    if (filtered.length === 0) {
+        wrapper.innerHTML = '<div class="text-center py-4 text-muted text-xs">No matching customers found.</div>';
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(c => {
+        const hasCredit = c.credit_limit > 0;
+        html += `
+            <div class="card card-custom p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="text-dark">${c.full_display_name}</strong>
+                    <span class="badge ${hasCredit ? 'bg-primary' : 'bg-secondary'} text-xs">${hasCredit ? 'Credit Cust' : 'Standard'}</span>
+                </div>
+                <div class="text-xs text-muted mb-2"><i class="fa-solid fa-phone me-1"></i> ${c.phone || 'No phone'} ${c.address ? `&bull; ${c.address}` : ''}</div>
+                
+                ${hasCredit ? `
+                    <div class="bg-light p-2 rounded text-xs border">
+                        <div class="d-flex justify-content-between">
+                            <span>Credit Limit:</span> <strong>Rs. ${c.credit_limit.toFixed(2)}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between text-danger">
+                            <span>Outstanding:</span> <strong>Rs. ${c.total_outstanding.toFixed(2)}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between text-success border-top pt-1 fw-bold">
+                            <span>Available Credit:</span> <span>Rs. ${c.available_credit.toFixed(2)}</span>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${(c.discount_biscuits > 0 || c.discount_other > 0) ? `
+                    <div class="mt-2 text-xs text-warning-emphasis">
+                        <i class="fa-solid fa-percent me-1"></i> Discounts: Biscuits ${c.discount_biscuits}%, Other ${c.discount_other}%
+                    </div>
+                ` : ''}
+            </div>`;
+    });
+    wrapper.innerHTML = html;
+}
+
+function filterMobileCustomers() {
+    const q = document.getElementById('custSearchInput').value;
+    renderMobileCustomersList(q);
+}
+
+function openCreateCustomerModal() {
+    MobileSwal.fire({
+        title: `<div style="font-size:1.05rem;" class="fw-bold text-dark"><i class="fa-solid fa-user-plus text-warning me-1"></i> Register New Customer</div>`,
+        html: `
+            <div class="text-start text-xs">
+                <div class="row g-2 mb-2">
+                    <div class="col-4">
+                        <label class="form-label mb-1 fw-bold">Title</label>
+                        <select id="swalCustTitle" class="form-select form-select-sm">
+                            <option value="Mr.">Mr.</option>
+                            <option value="Mrs.">Mrs.</option>
+                            <option value="Miss">Miss</option>
+                            <option value="Dr.">Dr.</option>
+                            <option value="Rev.">Rev.</option>
+                        </select>
+                    </div>
+                    <div class="col-8">
+                        <label class="form-label mb-1 fw-bold">Customer Name *</label>
+                        <input type="text" id="swalCustName" class="form-control form-control-sm" placeholder="e.g. John Silva">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label mb-1 fw-bold">Mobile Phone *</label>
+                    <input type="text" id="swalCustPhone" class="form-control form-control-sm" placeholder="e.g. 0771234567">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label mb-1 fw-bold">Address</label>
+                    <input type="text" id="swalCustAddress" class="form-control form-control-sm" placeholder="Street / Town / City">
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="form-label mb-1 fw-bold">Credit Limit (Rs.)</label>
+                        <input type="number" id="swalCustCredit" class="form-control form-control-sm" value="0.00" min="0" step="1000">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mb-1 fw-bold">Email</label>
+                        <input type="email" id="swalCustEmail" class="form-control form-control-sm" placeholder="Optional">
+                    </div>
+                </div>
+                <div class="row g-2 mb-1">
+                    <div class="col-6">
+                        <label class="form-label mb-1 fw-bold">Biscuits Disc %</label>
+                        <input type="number" id="swalCustDiscBisc" class="form-control form-control-sm" value="0" min="0" max="100">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mb-1 fw-bold">Other Disc %</label>
+                        <input type="number" id="swalCustDiscOther" class="form-control form-control-sm" value="0" min="0" max="100">
+                    </div>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-check me-1"></i> Register',
+        confirmButtonColor: '#d97724',
+        cancelButtonText: 'Cancel',
+        preConfirm: () => {
+            const title = document.getElementById('swalCustTitle').value;
+            const name = document.getElementById('swalCustName').value.trim();
+            const phone = document.getElementById('swalCustPhone').value.trim();
+            const address = document.getElementById('swalCustAddress').value.trim();
+            const email = document.getElementById('swalCustEmail').value.trim();
+            const credit_limit = parseFloat(document.getElementById('swalCustCredit').value || 0);
+            const discount_biscuits = parseFloat(document.getElementById('swalCustDiscBisc').value || 0);
+            const discount_other = parseFloat(document.getElementById('swalCustDiscOther').value || 0);
+
+            if (!name) {
+                Swal.showValidationMessage('Please enter Customer Name');
+                return false;
+            }
+            if (!phone) {
+                Swal.showValidationMessage('Please enter Mobile Phone Number');
+                return false;
+            }
+            return {
+                title, name, phone, address, email, credit_limit, discount_biscuits, discount_other
+            };
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed && result.value) {
+            if (isDemoMode) {
+                const newCustId = (customerList.length > 0) ? Math.max(...customerList.map(c => c.id)) + 1 : 1;
+                const newCust = {
+                    id: newCustId,
+                    title: result.value.title,
+                    name: result.value.name,
+                    full_display_name: `${result.value.title} ${result.value.name}`,
+                    phone: result.value.phone,
+                    address: result.value.address,
+                    email: result.value.email,
+                    credit_limit: result.value.credit_limit,
+                    total_outstanding: 0.00,
+                    available_credit: result.value.credit_limit,
+                    discount_biscuits: result.value.discount_biscuits,
+                    discount_other: result.value.discount_other
+                };
+                customerList.unshift(newCust);
+                populateCustDropdown();
+                MobileSwal.fire({
+                    icon: 'success',
+                    title: 'Registered!',
+                    text: `Customer "${newCust.full_display_name}" registered successfully!`,
+                    confirmButtonColor: '#d97724'
+                });
+                renderMobileCustomersList();
+                switchScreen('screenCustomers');
+                return;
+            }
+
+            try {
+                const data = await fetchJson(`${API_BASE}/customers/create.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Token': apiToken
+                    },
+                    body: JSON.stringify(result.value)
+                });
+
+                if (data.success) {
+                    MobileSwal.fire({
+                        icon: 'success',
+                        title: 'Registered!',
+                        text: data.message,
+                        confirmButtonColor: '#d97724'
+                    });
+                    loadMasterData();
+                    switchScreen('screenCustomers');
+                } else {
+                    MobileSwal.fire({
+                        icon: 'error',
+                        title: 'Registration Error',
+                        text: data.message,
+                        confirmButtonColor: '#d97724'
+                    });
+                }
+            } catch (e) {
+                MobileSwal.fire({
+                    icon: 'error',
+                    title: 'Network Error',
+                    text: e.message,
+                    confirmButtonColor: '#d97724'
+                });
+            }
+        }
+    });
+}
+
+function setReportPreset(preset, btn) {
+    if (btn) {
+        document.querySelectorAll('#screenReports .btn-group .btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+
+    if (preset === 'today') {
+        document.getElementById('reportDateFrom').value = today;
+        document.getElementById('reportDateTo').value = today;
+    } else if (preset === 'month') {
+        const d = new Date();
+        const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+        document.getElementById('reportDateFrom').value = firstDay;
+        document.getElementById('reportDateTo').value = today;
+    }
+    loadMobileSalesReport();
+}
+
+function renderSalesReportData(data) {
+    const wrapper = document.getElementById('reportContentContainer');
+    const s = data.summary;
+    const pb = data.payment_breakdown;
+    const topProds = data.top_products || [];
+    const orders = data.orders || [];
+
+    let html = `
+        <!-- Summary Metrics -->
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <div class="card card-custom p-2 text-center bg-white">
+                    <small class="text-muted text-xs d-block">Net Sales Revenue</small>
+                    <strong class="text-dark fs-6">Rs. ${parseFloat(s.net_sales).toFixed(2)}</strong>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card card-custom p-2 text-center bg-white">
+                    <small class="text-muted text-xs d-block">Total Collected</small>
+                    <strong class="text-success fs-6">Rs. ${parseFloat(s.total_collected).toFixed(2)}</strong>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card card-custom p-2 text-center bg-white">
+                    <small class="text-muted text-xs d-block">Outstanding Balance</small>
+                    <strong class="text-danger fs-6">Rs. ${parseFloat(s.total_outstanding).toFixed(2)}</strong>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card card-custom p-2 text-center bg-white">
+                    <small class="text-muted text-xs d-block">Orders Booked</small>
+                    <strong class="text-primary fs-6">${s.total_orders_count}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Channels Breakdown -->
+        <div class="card card-custom p-3 mb-3">
+            <div class="fw-bold text-xs text-dark mb-2"><i class="fa-solid fa-wallet text-warning me-1"></i> Payment Channels</div>
+            <div class="d-flex justify-content-between text-xs border-bottom pb-1 mb-1">
+                <span>💵 Cash (${pb.cash ? pb.cash.count : 0}):</span>
+                <strong class="text-success">Rs. ${pb.cash ? parseFloat(pb.cash.total).toFixed(2) : '0.00'}</strong>
+            </div>
+            <div class="d-flex justify-content-between text-xs border-bottom pb-1 mb-1">
+                <span>🏦 Cheque (${pb.cheque ? pb.cheque.count : 0}):</span>
+                <strong class="text-primary">Rs. ${pb.cheque ? parseFloat(pb.cheque.total).toFixed(2) : '0.00'}</strong>
+            </div>
+            <div class="d-flex justify-content-between text-xs">
+                <span>📱 Online (${pb.online ? pb.online.count : 0}):</span>
+                <strong class="text-info">Rs. ${pb.online ? parseFloat(pb.online.total).toFixed(2) : '0.00'}</strong>
+            </div>
+        </div>`;
+
+    if (topProds.length > 0) {
+        html += `
+            <!-- Top Selling Items -->
+            <div class="card card-custom p-3 mb-3">
+                <div class="fw-bold text-xs text-dark mb-2"><i class="fa-solid fa-trophy text-warning me-1"></i> Top Selling Items</div>`;
+        topProds.forEach(tp => {
+            html += `
+                <div class="d-flex justify-content-between text-xs border-bottom py-1">
+                    <span class="text-truncate" style="max-width: 180px;">${tp.product_name}</span>
+                    <span><strong>${tp.total_qty} pcs</strong> &bull; <small class="text-success">Rs. ${parseFloat(tp.total_sales).toFixed(2)}</small></span>
+                </div>`;
+        });
+        html += `</div>`;
+    }
+
+    html += `
+        <!-- Period Orders Log -->
+        <div class="card card-custom p-3">
+            <div class="fw-bold text-xs text-dark mb-2"><i class="fa-solid fa-list-check text-warning me-1"></i> Period Orders (${orders.length})</div>`;
+
+    if (orders.length === 0) {
+        html += `<div class="text-muted text-center py-2 text-xs">No orders recorded in this date range.</div>`;
+    } else {
+        orders.forEach(o => {
+            const isPaid = o.payment_status === 'paid' || o.balance_due <= 0;
+            html += `
+                <div class="border-bottom py-2 text-xs">
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>${o.order_number} (${o.customer_name})</span>
+                        <span class="${isPaid ? 'text-success' : 'text-danger'}">Rs. ${parseFloat(o.total_amount).toFixed(2)}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted mt-1">
+                        <span>${o.created_at}</span>
+                        <span>Paid: Rs. ${parseFloat(o.paid_amount).toFixed(2)} (${o.payment_method})</span>
+                    </div>
+                </div>`;
+        });
+    }
+
+    html += `</div>`;
+    wrapper.innerHTML = html;
+}
+
+function calculateDemoReportData() {
+    let netSales = 0;
+    let totalCollected = 0;
+    let totalOutstanding = 0;
+    const pb = {
+        cash: { count: 0, total: 0 },
+        cheque: { count: 0, total: 0 },
+        online: { count: 0, total: 0 }
+    };
+
+    demoOrders.forEach(o => {
+        netSales += parseFloat(o.total_amount) || 0;
+        totalCollected += parseFloat(o.paid_amount) || 0;
+        totalOutstanding += parseFloat(o.balance_due) || 0;
+
+        const m = (o.payment_method || 'cash').toLowerCase();
+        if (pb[m]) {
+            pb[m].count += 1;
+            pb[m].total += parseFloat(o.paid_amount) || 0;
+        } else {
+            pb.cash.count += 1;
+            pb.cash.total += parseFloat(o.paid_amount) || 0;
+        }
+    });
+
+    const s = {
+        net_sales: netSales,
+        total_collected: totalCollected,
+        total_outstanding: totalOutstanding,
+        total_orders_count: demoOrders.length
+    };
+
+    const topProds = [
+        { product_name: 'White Bread', total_qty: 48, total_sales: 5760.00 },
+        { product_name: 'Chocolate Danish', total_qty: 24, total_sales: 6000.00 },
+        { product_name: 'Flaky Butter Croissant', total_qty: 15, total_sales: 4200.00 },
+        { product_name: 'Cream Bun', total_qty: 30, total_sales: 3000.00 }
+    ];
+
+    return {
+        summary: s,
+        payment_breakdown: pb,
+        top_products: topProds,
+        orders: demoOrders
+    };
+}
+
+async function loadMobileSalesReport() {
+    const fromInput = document.getElementById('reportDateFrom');
+    const toInput = document.getElementById('reportDateTo');
+
+    const today = new Date().toISOString().split('T')[0];
+    if (!fromInput.value) {
+        const d = new Date();
+        fromInput.value = new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+    }
+    if (!toInput.value) {
+        toInput.value = today;
+    }
+
+    const wrapper = document.getElementById('reportContentContainer');
+    if (isDemoMode) {
+        renderSalesReportData(calculateDemoReportData());
+        return;
+    }
+
+    try {
+        const data = await fetchJson(`${API_BASE}/reports/sales.php?date_from=${fromInput.value}&date_to=${toInput.value}`, {
+            headers: { 'X-API-Token': apiToken }
+        });
+
+        if (data.success && data.data) {
+            renderSalesReportData(data.data);
+        } else {
+            renderSalesReportData(calculateDemoReportData());
+        }
+    } catch (e) {
+        console.warn('Network error loading report, falling back to demo data', e);
+        renderSalesReportData(calculateDemoReportData());
+    }
+}
+
+function openNewOrderScreen() {
+    switchScreen('screenCreateOrder');
+}
+</script>
+</body>
+</html>

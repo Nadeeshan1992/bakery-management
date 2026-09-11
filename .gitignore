@@ -1,0 +1,11 @@
+# Environment & Secrets
+.env
+*.log
+
+# OS generated
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Dependencies
+node_modules/

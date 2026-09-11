@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "name": "bakery-sales-mobile",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/mobile_app/index.html" },
+    { "source": "/mobile", "destination": "/mobile_app/index.html" },
+    { "source": "/mobile_app/(.*)", "destination": "/mobile_app/$1" },
+    { "source": "/assets/(.*)", "destination": "/mobile_app/assets/$1" },
+    { "source": "/(.*)", "destination": "/mobile_app/index.html" }
+  ]
+}
