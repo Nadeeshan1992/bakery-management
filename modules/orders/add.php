@@ -327,8 +327,8 @@ require_once __DIR__ . '/../../includes/header.php';
 
                         <!-- Column Headers -->
                         <div class="row g-2 mb-2 px-2 text-muted text-xs fw-bold text-uppercase border-bottom pb-2 d-none d-md-flex">
-                            <div class="col-md-3">Category Filter</div>
-                            <div class="col-md-3">Product Name</div>
+                            <div class="col-md-2">Category Filter</div>
+                            <div class="col-md-4">Product Name & Available Stock</div>
                             <div class="col-md-1 text-center">Qty</div>
                             <div class="col-md-2 text-end">Discount (Rs.)</div>
                             <div class="col-md-2 text-end">Subtotal</div>
@@ -338,7 +338,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <div id="orderItemsWrapper">
                             <div class="row g-2 mb-2 order-item-row align-items-center bg-light p-2 rounded border">
                                 <!-- Category Filter -->
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <select class="form-select form-select-sm category-select" onchange="filterRowProducts(this)">
                                         <option value="all">-- All Categories --</option>
                                         <?php foreach ($categories as $cat): ?>
@@ -348,19 +348,28 @@ require_once __DIR__ . '/../../includes/header.php';
                                 </div>
 
                                 <!-- Product Select -->
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <select name="product_ids[]" class="form-select form-select-sm product-select" onchange="calculateOrderTotals()" required>
-                                        <option value="" data-price="0">-- Select Product --</option>
+                                        <option value="" data-price="0" data-stock="0" data-unit="pcs">-- Select Product --</option>
                                         <?php foreach ($products as $p): ?>
-                                            <?php $effectivePrice = ($p['price_retail'] > 0) ? $p['price_retail'] : $p['price']; ?>
+                                            <?php 
+                                                $effectivePrice = ($p['price_retail'] > 0) ? $p['price_retail'] : $p['price']; 
+                                                $stock = floatval($p['current_stock'] ?? 0);
+                                                $unit = htmlspecialchars($p['unit'] ?? 'pcs');
+                                            ?>
                                             <option value="<?php echo $p['id']; ?>" 
                                                     data-category-id="<?php echo $p['category_id']; ?>" 
                                                     data-category-name="<?php echo htmlspecialchars($p['category_name'] ?? ''); ?>" 
-                                                    data-price="<?php echo $effectivePrice; ?>">
-                                                <?php echo htmlspecialchars($p['name']); ?> - Rs. <?php echo number_format($effectivePrice, 2); ?>
+                                                    data-price="<?php echo $effectivePrice; ?>"
+                                                    data-stock="<?php echo $stock; ?>"
+                                                    data-unit="<?php echo $unit; ?>">
+                                                <?php echo htmlspecialchars($p['name']); ?> - Rs. <?php echo number_format($effectivePrice, 2); ?> (Stock: <?php echo $stock . ' ' . $unit; ?>)
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <div class="product-stock-display mt-1 text-xs" style="display: none;">
+                                        <span class="stock-badge badge py-1 px-2"></span>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-1">
@@ -600,7 +609,13 @@ function addOrderItemRow() {
         opt.disabled = false;
     });
 
-    newRow.querySelector('.qty-input').value = '1';
+    const stockDisplay = newRow.querySelector('.product-stock-display');
+    if (stockDisplay) stockDisplay.style.display = 'none';
+
+    const qtyInput = newRow.querySelector('.qty-input');
+    qtyInput.value = '1';
+    qtyInput.classList.remove('is-invalid');
+
     newRow.querySelector('.row-discount-display').innerHTML = '<span class="text-muted" style="font-size:0.8rem;">Rs. 0.00</span>';
     newRow.querySelector('.row-subtotal-display').innerText = 'Rs. 0.00';
     wrapper.appendChild(newRow);
@@ -634,7 +649,36 @@ function calculateOrderTotals() {
         const selectedOption = select.options[select.selectedIndex];
         const price = parseFloat(selectedOption?.getAttribute('data-price') || 0);
         const catName = (selectedOption?.getAttribute('data-category-name') || '').toLowerCase();
+        const stock = parseFloat(selectedOption?.getAttribute('data-stock') || 0);
+        const unit = selectedOption?.getAttribute('data-unit') || 'pcs';
         const qty = parseInt(qtyInput.value || 1);
+
+        // Update Live Available Stock Display
+        const stockDisplay = row.querySelector('.product-stock-display');
+        const stockBadge = row.querySelector('.stock-badge');
+        if (select.value && stockDisplay && stockBadge) {
+            stockDisplay.style.display = 'block';
+            if (stock <= 0) {
+                stockBadge.className = 'stock-badge badge bg-danger-subtle text-danger border border-danger-subtle';
+                stockBadge.innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i> Out of Stock (0 ${unit})`;
+                qtyInput.classList.add('is-invalid');
+            } else if (qty > stock) {
+                stockBadge.className = 'stock-badge badge bg-danger text-white border border-danger shadow-sm';
+                stockBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> Exceeds Stock! (Avail: <strong>${stock} ${unit}</strong>)`;
+                qtyInput.classList.add('is-invalid');
+            } else if (stock <= 10) {
+                stockBadge.className = 'stock-badge badge bg-warning-subtle text-dark border border-warning-subtle';
+                stockBadge.innerHTML = `<i class="fa-solid fa-boxes-stacked me-1 text-warning"></i> Available Stock: <strong>${stock} ${unit}</strong>`;
+                qtyInput.classList.remove('is-invalid');
+            } else {
+                stockBadge.className = 'stock-badge badge bg-success-subtle text-success border border-success-subtle';
+                stockBadge.innerHTML = `<i class="fa-solid fa-boxes-stacked me-1 text-success"></i> Available Stock: <strong>${stock} ${unit}</strong>`;
+                qtyInput.classList.remove('is-invalid');
+            }
+        } else if (stockDisplay) {
+            stockDisplay.style.display = 'none';
+            qtyInput.classList.remove('is-invalid');
+        }
 
         const grossRowSubtotal = price * qty;
         grandSubtotal += grossRowSubtotal;
@@ -780,6 +824,36 @@ document.addEventListener('DOMContentLoaded', function() {
     handleOrderTypeChange();
     calculateOrderTotals();
     toggleOrderChequeRefField();
+
+    const form = document.getElementById('orderBookingForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const rows = document.querySelectorAll('.order-item-row');
+            for (const row of rows) {
+                const select = row.querySelector('.product-select');
+                const qtyInput = row.querySelector('.qty-input');
+                if (!select || !select.value) continue;
+                const opt = select.options[select.selectedIndex];
+                const stock = parseFloat(opt.getAttribute('data-stock') || 0);
+                const unit = opt.getAttribute('data-unit') || 'pcs';
+                const qty = parseInt(qtyInput ? qtyInput.value : 1);
+                const prodName = opt.text.split(' - ')[0] || 'Selected product';
+
+                if (stock <= 0) {
+                    e.preventDefault();
+                    alert(`Cannot book order: "${prodName}" is OUT OF STOCK! (Available: 0 ${unit}). Please select another item or enter stock first.`);
+                    select.focus();
+                    return false;
+                }
+                if (qty > stock) {
+                    e.preventDefault();
+                    alert(`Cannot book order: "${prodName}" requested quantity (${qty} ${unit}) exceeds available stock (${stock} ${unit}). Please adjust the quantity.`);
+                    qtyInput.focus();
+                    return false;
+                }
+            }
+        });
+    }
 });
 </script>
 
