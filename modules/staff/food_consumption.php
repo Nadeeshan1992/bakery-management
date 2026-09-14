@@ -28,7 +28,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
             $stmtDel->execute([$deleteId]);
 
             $db->commit();
-            setFlash('success', "Food consumption entry deleted. Restored " . number_format($entry['quantity'], 1) . " pcs of '" . $entry['product_name'] . "' back to inventory stock.");
+            setFlash('success', "Food record deleted and stock restored.");
         } else {
             setFlash('danger', "Record not found.");
         }
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $stmtDeduct->execute([$quantity, $productId]);
 
                             $db->commit();
-                            setFlash('success', "Food consumption entry updated successfully! Inventory stock and paysheet deductions adjusted.");
+                            setFlash('success', "Food record updated successfully.");
                             header('Location: ' . BASE_URL . 'modules/staff/food_consumption.php?month=' . urlencode(date('Y-m', strtotime($consumptionDate))));
                             exit;
                         }
@@ -235,9 +235,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $db->commit();
 
-                    $billUrl = BASE_URL . "modules/staff/food_bill.php?bill_no=" . urlencode($billNo);
-                    setFlash('success', "Food items successfully issued! <strong>Bill #" . htmlspecialchars($billNo) . "</strong> (Rs. " . number_format($totalBillAmount, 2) . ") created. <a href='" . $billUrl . "' target='_blank' class='btn btn-sm btn-dark text-warning fw-bold ms-2 shadow-sm'><i class='fa-solid fa-print me-1'></i> Print Bill Now</a>");
-                    header('Location: ' . BASE_URL . 'modules/staff/food_consumption.php?last_bill=' . urlencode($billNo) . '&month=' . urlencode(date('Y-m', strtotime($consumptionDate))));
+                    setFlash('success', "Food items issued successfully! Bill #" . $billNo);
+                    header('Location: ' . BASE_URL . 'modules/staff/food_consumption.php?month=' . urlencode(date('Y-m', strtotime($consumptionDate))));
                     exit;
 
                 } catch (Exception $e) {
@@ -293,19 +292,6 @@ foreach ($foodLogs as $fl) {
     </div>
 </div>
 
-<?php if ($lastBill): ?>
-    <div class="alert alert-success d-flex justify-content-between align-items-center p-3 mb-4 shadow-sm border border-success">
-        <div>
-            <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-check text-success me-2"></i> Food Items Issued & Billed Successfully!</h6>
-            <p class="mb-0 text-xs">Voucher <strong>#<?php echo htmlspecialchars($lastBill); ?></strong> is saved, stock deducted from inventory, and debited to staff payroll.</p>
-        </div>
-        <div>
-            <a href="<?php echo BASE_URL; ?>modules/staff/food_bill.php?bill_no=<?php echo urlencode($lastBill); ?>" target="_blank" class="btn btn-dark text-warning fw-bold px-3">
-                <i class="fa-solid fa-print me-1"></i> Print Bill Receipt
-            </a>
-        </div>
-    </div>
-<?php endif; ?>
 
 <?php if ($error): ?>
     <div class="alert alert-danger d-flex align-items-center mb-4">
