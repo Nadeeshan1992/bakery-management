@@ -33,6 +33,14 @@ try {
         echo "Column 'food_deduction' added to staff_salaries.\n";
     }
 
+    // 3. Add bill_no column to staff_food_consumption if not exists
+    $stmtBillCheck = $db->query("SHOW COLUMNS FROM staff_food_consumption LIKE 'bill_no'");
+    if (!$stmtBillCheck->fetch()) {
+        $db->exec("ALTER TABLE staff_food_consumption ADD COLUMN `bill_no` VARCHAR(50) DEFAULT NULL AFTER `id`, ADD INDEX `idx_bill_no` (`bill_no`)");
+        $db->exec("UPDATE staff_food_consumption SET `bill_no` = CONCAT('SFC-', LPAD(id, 5, '0')) WHERE `bill_no` IS NULL OR `bill_no` = ''");
+        echo "Column 'bill_no' added to staff_food_consumption and existing rows backfilled.\n";
+    }
+
     echo "Staff food consumption migration completed successfully!\n";
 
 } catch (Exception $e) {
