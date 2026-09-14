@@ -8,33 +8,49 @@ $db = getDB();
 $message = '';
 $error = '';
 
-// Handle Delete Request
-if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $deleteId = (int)$_GET['id'];
+// Handle Delete Request (by bill_no or id)
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && (!empty($_GET['bill_no']) || !empty($_GET['id']))) {
+    $billNo = trim($_GET['bill_no'] ?? '');
+    $deleteId = (int)($_GET['id'] ?? 0);
     try {
-        $stmtEntry = $db->prepare("SELECT * FROM staff_food_consumption WHERE id = ?");
-        $stmtEntry->execute([$deleteId]);
-        $entry = $stmtEntry->fetch();
+        if (!empty($billNo)) {
+            $stmtEntries = $db->prepare("SELECT * FROM staff_food_consumption WHERE bill_no = ?");
+            $stmtEntries->execute([$billNo]);
+            $entries = $stmtEntries->fetchAll();
+        } else {
+            $stmtEntries = $db->prepare("SELECT * FROM staff_food_consumption WHERE id = ?");
+            $stmtEntries->execute([$deleteId]);
+            $entries = $stmtEntries->fetchAll();
+        }
 
-        if ($entry) {
+        if (!empty($entries)) {
             $db->beginTransaction();
 
-            // Restore product stock
+            // Restore product stock for each item in the bill
             $stmtRestock = $db->prepare("UPDATE products SET current_stock = current_stock + ? WHERE id = ?");
-            $stmtRestock->execute([$entry['quantity'], $entry['product_id']]);
+            foreach ($entries as $item) {
+                if (!empty($item['product_id']) && (float)$item['quantity'] > 0) {
+                    $stmtRestock->execute([$item['quantity'], $item['product_id']]);
+                }
+            }
 
-            // Delete entry record
-            $stmtDel = $db->prepare("DELETE FROM staff_food_consumption WHERE id = ?");
-            $stmtDel->execute([$deleteId]);
+            // Delete entry records
+            if (!empty($billNo)) {
+                $stmtDel = $db->prepare("DELETE FROM staff_food_consumption WHERE bill_no = ?");
+                $stmtDel->execute([$billNo]);
+            } else {
+                $stmtDel = $db->prepare("DELETE FROM staff_food_consumption WHERE id = ?");
+                $stmtDel->execute([$deleteId]);
+            }
 
             $db->commit();
-            setFlash('success', "Food record deleted and stock restored.");
+            setFlash('success', "Food bill deleted and stock restored.");
         } else {
             setFlash('danger', "Record not found.");
         }
     } catch (Exception $e) {
         if ($db->inTransaction()) $db->rollBack();
-        setFlash('danger', "Error deleting entry: " . $e->getMessage());
+        setFlash('danger', "Error deleting bill: " . $e->getMessage());
     }
     $monthParam = $_GET['month'] ?? date('Y-m');
     header('Location: ' . BASE_URL . 'modules/staff/food_consumption.php?month=' . urlencode($monthParam));
@@ -268,12 +284,43 @@ $query .= " ORDER BY f.consumption_date DESC, f.id DESC";
 
 $stmtLogs = $db->prepare($query);
 $stmtLogs->execute($params);
-$foodLogs = $stmtLogs->fetchAll();
+$rawLogs = $stmtLogs->fetchAll();
 
-// Total monthly food consumption cost
+// Group logs by Bill Number so multiple items appear on ONE single row
+$groupedBills = [];
 $totalMonthlyFood = 0;
-foreach ($foodLogs as $fl) {
-    $totalMonthlyFood += (float)$fl['total_price'];
+foreach ($rawLogs as $r) {
+    $totalMonthlyFood += (float)$r['total_price'];
+    $billNo = !empty($r['bill_no']) ? $r['bill_no'] : ('SFC-' . str_pad($r['id'], 5, '0', STR_PAD_LEFT));
+    
+    if (!isset($groupedBills[$billNo])) {
+        $groupedBills[$billNo] = [
+            'bill_no'          => $billNo,
+            'primary_id'       => $r['id'],
+            'staff_id'         => $r['staff_id'],
+            'staff_name'       => $r['staff_name'],
+            'emp_number'       => $r['emp_number'],
+            'designation'      => $r['designation'],
+            'consumption_date' => $r['consumption_date'],
+            'notes'            => $r['notes'],
+            'created_by_name'  => $r['created_by_name'],
+            'total_amount'     => 0,
+            'total_qty'        => 0,
+            'items'            => []
+        ];
+    }
+    
+    $groupedBills[$billNo]['total_amount'] += (float)$r['total_price'];
+    $groupedBills[$billNo]['total_qty'] += (float)$r['quantity'];
+    $groupedBills[$billNo]['items'][] = [
+        'id'           => $r['id'],
+        'product_id'   => $r['product_id'],
+        'product_name' => $r['product_name'],
+        'quantity'     => (float)$r['quantity'],
+        'unit_price'   => (float)$r['unit_price'],
+        'total_price'  => (float)$r['total_price'],
+        'notes'        => $r['notes']
+    ];
 }
 ?>
 
@@ -530,48 +577,55 @@ foreach ($foodLogs as $fl) {
                     <th>Bill #</th>
                     <th>EMP Code</th>
                     <th>Staff Member</th>
-                    <th>Product Name</th>
-                    <th>Qty</th>
-                    <th>Unit Price</th>
+                    <th>Items Taken</th>
+                    <th>Total Qty</th>
                     <th>Total Deducted</th>
                     <th>Notes</th>
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($foodLogs)): ?>
+                <?php if (empty($groupedBills)): ?>
                     <tr>
-                        <td colspan="10" class="text-center text-muted py-4">No staff food consumption logged for <?php echo date('F Y', strtotime($selectedMonth . '-01')); ?>.</td>
+                        <td colspan="9" class="text-center text-muted py-4">No staff food consumption logged for <?php echo date('F Y', strtotime($selectedMonth . '-01')); ?>.</td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($foodLogs as $log): ?>
+                    <?php foreach ($groupedBills as $bill): 
+                        $itemsSummaryText = [];
+                        foreach ($bill['items'] as $it) {
+                            $itemsSummaryText[] = $it['product_name'] . ' (' . number_format($it['quantity'], 1) . ' pcs)';
+                        }
+                        $summaryString = implode(', ', $itemsSummaryText);
+                    ?>
                         <tr>
-                            <td><strong><?php echo date('M d, Y', strtotime($log['consumption_date'])); ?></strong></td>
+                            <td><strong><?php echo date('M d, Y', strtotime($bill['consumption_date'])); ?></strong></td>
                             <td>
-                                <?php if (!empty($log['bill_no'])): ?>
-                                    <span class="badge bg-secondary-subtle text-dark border font-monospace"><?php echo htmlspecialchars($log['bill_no']); ?></span>
-                                <?php else: ?>
-                                    <span class="badge bg-light text-muted border font-monospace">#<?php echo $log['id']; ?></span>
-                                <?php endif; ?>
+                                <span class="badge bg-secondary-subtle text-dark border font-monospace"><?php echo htmlspecialchars($bill['bill_no']); ?></span>
                             </td>
-                            <td><code><?php echo htmlspecialchars($log['emp_number']); ?></code></td>
-                            <td><strong class="text-dark"><?php echo htmlspecialchars($log['staff_name']); ?></strong></td>
-                            <td><span class="badge bg-light text-dark border"><i class="fa-solid fa-bread-slice me-1 text-warning"></i> <?php echo htmlspecialchars($log['product_name']); ?></span></td>
-                            <td><strong><?php echo number_format($log['quantity'], 1); ?> pcs</strong></td>
-                            <td><?php echo formatMoney($log['unit_price']); ?></td>
-                            <td><strong class="text-danger"><?php echo formatMoney($log['total_price']); ?></strong></td>
-                            <td><small class="text-muted"><?php echo htmlspecialchars($log['notes'] ?: '-'); ?></small></td>
+                            <td><code><?php echo htmlspecialchars($bill['emp_number']); ?></code></td>
+                            <td><strong class="text-dark"><?php echo htmlspecialchars($bill['staff_name']); ?></strong></td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <?php foreach ($bill['items'] as $it): ?>
+                                        <span class="badge bg-light text-dark border px-2 py-1">
+                                            <i class="fa-solid fa-bread-slice me-1 text-warning"></i>
+                                            <?php echo htmlspecialchars($it['product_name']); ?> 
+                                            <strong class="text-primary">&times; <?php echo number_format($it['quantity'], 1); ?></strong>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            </td>
+                            <td>
+                                <strong><?php echo number_format($bill['total_qty'], 1); ?> pcs</strong>
+                                <small class="text-muted d-block text-xs"><?php echo count($bill['items']); ?> <?php echo count($bill['items']) > 1 ? 'items' : 'item'; ?></small>
+                            </td>
+                            <td><strong class="text-danger fs-6"><?php echo formatMoney($bill['total_amount']); ?></strong></td>
+                            <td><small class="text-muted"><?php echo htmlspecialchars($bill['notes'] ?: '-'); ?></small></td>
                             <td class="text-end text-nowrap">
-                                <?php 
-                                    $printUrl = BASE_URL . "modules/staff/food_bill.php?" . (!empty($log['bill_no']) ? "bill_no=" . urlencode($log['bill_no']) : "id=" . $log['id']);
-                                ?>
-                                <a href="<?php echo $printUrl; ?>" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="Print Bill Voucher">
+                                <a href="<?php echo BASE_URL; ?>modules/staff/food_bill.php?bill_no=<?php echo urlencode($bill['bill_no']); ?>" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="Print Bill Voucher">
                                     <i class="fa-solid fa-print"></i> Bill
                                 </a>
-                                <a href="<?php echo BASE_URL; ?>modules/staff/food_consumption.php?edit_id=<?php echo $log['id']; ?>&month=<?php echo urlencode($selectedMonth); ?>" class="btn btn-sm btn-outline-secondary me-1" title="Edit Record">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" title="Delete and Restore Stock" onclick="triggerDeleteModal(<?php echo $log['id']; ?>, '<?php echo htmlspecialchars(addslashes($log['product_name'])); ?>', <?php echo $log['quantity']; ?>, '<?php echo htmlspecialchars(addslashes($log['staff_name'])); ?>', '<?php echo urlencode($selectedMonth); ?>')">
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Delete Bill & Restore Stock" onclick="triggerDeleteBillModal('<?php echo htmlspecialchars(addslashes($bill['bill_no'])); ?>', '<?php echo htmlspecialchars(addslashes($bill['staff_name'])); ?>', '<?php echo htmlspecialchars(addslashes($summaryString)); ?>', '<?php echo htmlspecialchars(addslashes(formatMoney($bill['total_amount']))); ?>', '<?php echo urlencode($selectedMonth); ?>')">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </td>
@@ -583,32 +637,33 @@ foreach ($foodLogs as $fl) {
     </div>
 </div>
 
-<!-- Custom Delete Confirmation Modal -->
+<!-- Custom Delete Confirmation Modal for Grouped Bill -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title fw-bold" id="deleteModalLabel"><i class="fa-solid fa-triangle-exclamation me-2"></i> Confirm Food Record Deletion</h5>
+                <h5 class="modal-title fw-bold" id="deleteModalLabel"><i class="fa-solid fa-triangle-exclamation me-2"></i> Confirm Food Bill Deletion</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 text-center">
                 <div class="text-danger mb-3">
                     <i class="fa-solid fa-trash-can fa-3x"></i>
                 </div>
-                <h6 class="fw-bold mb-2">Are you sure you want to delete this food record?</h6>
-                <p class="text-muted small mb-3">
-                    Product: <strong id="modal_product_name" class="text-dark"></strong><br>
-                    Issued To: <strong id="modal_staff_name" class="text-dark"></strong><br>
-                    Quantity to Restore: <strong id="modal_quantity" class="text-success fs-6"></strong> pcs
-                </p>
+                <h6 class="fw-bold mb-2">Are you sure you want to delete this bill record?</h6>
+                <div class="bg-light p-3 rounded border text-start mb-3 small">
+                    <div class="mb-1">Bill #: <strong id="modal_bill_no" class="text-dark font-monospace"></strong></div>
+                    <div class="mb-1">Issued To: <strong id="modal_staff_name" class="text-dark"></strong></div>
+                    <div class="mb-1">Items in Bill: <span id="modal_items_summary" class="text-dark fw-semibold"></span></div>
+                    <div>Total Amount: <strong id="modal_total_amount" class="text-danger fs-6"></strong></div>
+                </div>
                 <div class="alert alert-warning py-2 text-xs mb-0">
-                    <i class="fa-solid fa-circle-info me-1"></i> Deleting this record will <strong>restore <span id="modal_qty_text"></span> pcs back to bakery inventory stock</strong> and remove the cost deduction from the staff member's monthly paysheet.
+                    <i class="fa-solid fa-circle-info me-1"></i> Deleting this bill will <strong>restore stock for all products in this voucher</strong> and remove the cost deduction from the staff member's monthly paysheet.
                 </div>
             </div>
             <div class="modal-footer bg-light justify-content-center">
                 <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cancel</button>
                 <a id="modal_confirm_delete_btn" href="#" class="btn btn-danger font-weight-bold px-4">
-                    <i class="fa-solid fa-trash-can me-1"></i> Yes, Delete & Restore Stock
+                    <i class="fa-solid fa-trash-can me-1"></i> Yes, Delete Bill & Restore Stock
                 </a>
             </div>
         </div>
@@ -767,12 +822,12 @@ function calculateGrandSummary() {
     if (grandTotalElem) grandTotalElem.innerText = 'Rs. ' + grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
 
-function triggerDeleteModal(id, productName, quantity, staffName, month) {
-    document.getElementById('modal_product_name').innerText = productName;
+function triggerDeleteBillModal(billNo, staffName, itemsSummary, totalAmount, month) {
+    document.getElementById('modal_bill_no').innerText = billNo;
     document.getElementById('modal_staff_name').innerText = staffName;
-    document.getElementById('modal_quantity').innerText = quantity + ' pcs';
-    document.getElementById('modal_qty_text').innerText = quantity;
-    document.getElementById('modal_confirm_delete_btn').href = '<?php echo BASE_URL; ?>modules/staff/food_consumption.php?action=delete&id=' + id + '&month=' + month;
+    document.getElementById('modal_items_summary').innerText = itemsSummary;
+    document.getElementById('modal_total_amount').innerText = totalAmount;
+    document.getElementById('modal_confirm_delete_btn').href = '<?php echo BASE_URL; ?>modules/staff/food_consumption.php?action=delete&bill_no=' + encodeURIComponent(billNo) + '&month=' + encodeURIComponent(month);
     
     const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
     modal.show();
