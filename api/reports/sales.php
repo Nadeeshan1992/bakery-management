@@ -43,6 +43,9 @@ try {
     $preorderSalesValue = floatval($sum['preorder_sales_value'] ?? 0);
     $netSales = floatval($sum['net_sales'] ?? 0);
     $totalCollected = floatval($sum['total_collected'] ?? 0);
+    $settlementValue = $totalCollected;
+    $totalNetRevenue = $posSalesValue + $settlementValue;
+    $pendingAmount = $settlementValue - $preorderSalesValue;
     $totalOutstanding = max(0.00, $netSales - $totalCollected);
 
     // 2. Payment Method Breakdown
@@ -136,7 +139,9 @@ try {
             'total_orders_count'   => $totalOrdersCount,
             'pos_sales_value'      => $posSalesValue,
             'preorder_sales_value' => $preorderSalesValue,
-            'settlement_value'     => $totalCollected,
+            'settlement_value'     => $settlementValue,
+            'total_net_revenue'    => $totalNetRevenue,
+            'pending_amount'       => $pendingAmount,
             'net_sales'            => $netSales,
             'total_outstanding'    => $totalOutstanding
         ],

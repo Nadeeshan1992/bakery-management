@@ -32,6 +32,7 @@ $posSalesValue = (float)($summary['pos_sales_value'] ?? 0);
 $preorderSalesValue = (float)($summary['preorder_sales_value'] ?? 0);
 $settlementValue = (float)($summary['settlement_value'] ?? 0);
 $totalNetRevenue = $posSalesValue + $settlementValue;
+$pendingAmount = $settlementValue - $preorderSalesValue;
 
 // Breakdown by Payment Method
 $stmtPay = $db->prepare("
@@ -120,41 +121,50 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
 </div>
 
 <!-- Key Performance Indicators -->
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center border-primary shadow-sm">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">
+<div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
+    <div class="col">
+        <div class="card card-bakery p-3 text-center border-primary shadow-sm h-100">
+            <h6 class="text-muted text-uppercase fw-bold mb-1 fs-7">
                 <i class="fa-solid fa-calendar-check text-primary me-1"></i> Pre-Order Value
             </h6>
-            <h2 class="fw-bold text-primary mb-0"><?php echo formatMoney($preorderSalesValue); ?></h2>
+            <h3 class="fw-bold text-primary mb-0"><?php echo formatMoney($preorderSalesValue); ?></h3>
             <small class="text-muted mt-1 d-block">Booked Pre-Orders</small>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center shadow-sm">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">
+    <div class="col">
+        <div class="card card-bakery p-3 text-center shadow-sm h-100">
+            <h6 class="text-muted text-uppercase fw-bold mb-1 fs-7">
                 <i class="fa-solid fa-cash-register text-info me-1"></i> POS Sales Value
             </h6>
-            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($posSalesValue); ?></h2>
+            <h3 class="fw-bold text-dark mb-0"><?php echo formatMoney($posSalesValue); ?></h3>
             <small class="text-muted mt-1 d-block">Instant POS Sales</small>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center border-success shadow-sm">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">
+    <div class="col">
+        <div class="card card-bakery p-3 text-center border-success shadow-sm h-100">
+            <h6 class="text-muted text-uppercase fw-bold mb-1 fs-7">
                 <i class="fa-solid fa-hand-holding-dollar text-success me-1"></i> Settlement Value
             </h6>
-            <h2 class="fw-bold text-success mb-0"><?php echo formatMoney($settlementValue); ?></h2>
-            <small class="text-muted mt-1 d-block">Total Settlements Collected</small>
+            <h3 class="fw-bold text-success mb-0"><?php echo formatMoney($settlementValue); ?></h3>
+            <small class="text-muted mt-1 d-block">Total Settlements</small>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center border-warning shadow-sm">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">
+    <div class="col">
+        <div class="card card-bakery p-3 text-center border-warning shadow-sm h-100">
+            <h6 class="text-muted text-uppercase fw-bold mb-1 fs-7">
                 <i class="fa-solid fa-chart-line text-warning me-1"></i> Total Net Revenue
             </h6>
-            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($totalNetRevenue); ?></h2>
-            <small class="text-muted mt-1 d-block">POS Sales + Settlement Value</small>
+            <h3 class="fw-bold text-dark mb-0"><?php echo formatMoney($totalNetRevenue); ?></h3>
+            <small class="text-muted mt-1 d-block">POS + Settlement</small>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card card-bakery p-3 text-center border-danger shadow-sm h-100">
+            <h6 class="text-muted text-uppercase fw-bold mb-1 fs-7">
+                <i class="fa-solid fa-clock-rotate-left text-danger me-1"></i> Pending Amount
+            </h6>
+            <h3 class="fw-bold text-danger mb-0"><?php echo formatMoney($pendingAmount); ?></h3>
+            <small class="text-muted mt-1 d-block">Settlement - Pre-Order</small>
         </div>
     </div>
 </div>
