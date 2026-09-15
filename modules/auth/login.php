@@ -137,12 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div class="demo-credential-box mt-3 text-center">
-            <strong class="d-block mb-1 text-dark"><i class="fa-solid fa-key text-warning me-1"></i> Quick Demo Logins (Password: <code>password123</code>):</strong>
+            <strong class="d-block mb-1 text-dark"><i class="fa-solid fa-key text-warning me-1"></i> Default Admin Login:</strong>
             <div class="d-flex justify-content-center flex-wrap gap-2 mt-2">
-                <button class="btn btn-xs btn-outline-dark text-nowrap" onclick="setDemo('owner')">Owner</button>
-                <button class="btn btn-xs btn-outline-secondary text-nowrap" onclick="setDemo('admin')">Admin</button>
-                <button class="btn btn-xs btn-outline-primary text-nowrap" onclick="setDemo('sales')">Sales Person</button>
-                <button class="btn btn-xs btn-outline-success text-nowrap" onclick="setDemo('pos')">POS Operator</button>
+                <button class="btn btn-xs btn-outline-warning text-dark fw-bold text-nowrap" onclick="setDemo('admin')"><i class="fa-solid fa-user-shield me-1"></i> Admin (admin / password123)</button>
             </div>
         </div>
     </div>

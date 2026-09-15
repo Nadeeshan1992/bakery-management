@@ -94,6 +94,19 @@ $users = $stmt->fetchAll();
                                 <a href="<?php echo BASE_URL; ?>modules/users/edit.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-outline-secondary me-1">
                                     <i class="fa-solid fa-pen-to-square me-1"></i> Edit
                                 </a>
+                                <?php if ($user['id'] == getCurrentUserId()): ?>
+                                    <button class="btn btn-sm btn-light border text-muted" disabled title="Current User">
+                                        <i class="fa-solid fa-user-shield me-1"></i> Current User
+                                    </button>
+                                <?php elseif ($user['status'] === 'active'): ?>
+                                    <a href="<?php echo BASE_URL; ?>modules/users/toggle_status.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to deactivate <?php echo htmlspecialchars(addslashes($user['full_name'])); ?>?');">
+                                        <i class="fa-solid fa-user-xmark me-1"></i> Deactivate
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo BASE_URL; ?>modules/users/toggle_status.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-outline-success" onclick="return confirm('Are you sure you want to activate <?php echo htmlspecialchars(addslashes($user['full_name'])); ?>?');">
+                                        <i class="fa-solid fa-user-check me-1"></i> Activate
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
