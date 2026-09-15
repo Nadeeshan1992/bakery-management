@@ -60,11 +60,16 @@ require_once __DIR__ . '/../../includes/header.php';
                 <div class="row g-3">
                     <div class="col-md-8">
                         <label class="form-label font-weight-bold">Product Name *</label>
-                        <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($product['name']); ?>" required>
+                        <input type="text" name="name" id="productName" class="form-control" value="<?php echo htmlspecialchars($product['name']); ?>" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label font-weight-bold">SKU Code *</label>
-                        <input type="text" name="sku" class="form-control" value="<?php echo htmlspecialchars($product['sku']); ?>" required>
+                        <div class="input-group">
+                            <input type="text" name="sku" id="productSku" class="form-control" value="<?php echo htmlspecialchars($product['sku']); ?>" required>
+                            <button type="button" class="btn btn-outline-secondary" id="btnAutoSku" title="Regenerate SKU">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -117,5 +122,35 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('productName');
+    const skuInput = document.getElementById('productSku');
+    const btnAutoSku = document.getElementById('btnAutoSku');
+
+    function buildAutoSku(nameStr) {
+        if (!nameStr || !nameStr.trim()) return '';
+        const clean = nameStr.trim().replace(/[^a-zA-Z0-9\s]/g, '');
+        const allWords = clean.split(/\s+/).filter(w => w.length > 0);
+        const letterWords = allWords.filter(w => /^[a-zA-Z]/.test(w));
+        const words = letterWords.length > 0 ? letterWords : allWords;
+        let prefix = '';
+        if (words.length >= 2) {
+            prefix = words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+        } else if (words.length === 1) {
+            prefix = words[0].substring(0, 3).toUpperCase();
+        }
+        if (!prefix) prefix = 'PRD';
+        return prefix + '1001';
+    }
+
+    if (btnAutoSku && nameInput && skuInput) {
+        btnAutoSku.addEventListener('click', function() {
+            skuInput.value = buildAutoSku(nameInput.value);
+        });
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

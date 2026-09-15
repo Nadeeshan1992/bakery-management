@@ -16,13 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $priceWholesale = floatval($_POST['price_wholesale'] ?? 0);
     $unit = trim($_POST['unit'] ?? 'pcs');
 
+    if (empty($sku) && !empty($name)) {
+        $sku = generateAutoSKU($name, $db);
+    }
+
     if (empty($name) || empty($sku) || $categoryId <= 0 || $priceRetail < 0) {
-        setFlash('error', 'Please fill in Product Name, SKU, Category, and Selling Price (Retail).');
+        setFlash('error', 'Please fill in Product Name, Category, and Selling Price (Retail).');
     } else {
         try {
             $stmt = $db->prepare("INSERT INTO products (category_id, sku, name, price_retail, price_wholesale, price, unit, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'active')");
             $stmt->execute([$categoryId, $sku, $name, $priceRetail, $priceWholesale, $priceRetail, $unit]);
-            setFlash('success', 'Product "' . htmlspecialchars($name) . '" created successfully!');
+            setFlash('success', 'Product "' . htmlspecialchars($name) . '" created successfully with SKU: ' . htmlspecialchars($sku) . '!');
             header('Location: ' . BASE_URL . 'modules/products/index.php');
             exit;
         } catch (Exception $e) {
@@ -32,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $categories = $db->query("SELECT * FROM categories ORDER BY name ASC")->fetchAll();
+$existingSkus = $db->query("SELECT sku FROM products")->fetchAll(PDO::FETCH_COLUMN);
 
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -48,11 +53,17 @@ require_once __DIR__ . '/../../includes/header.php';
                 <div class="row g-3">
                     <div class="col-md-8">
                         <label class="form-label font-weight-bold">Product Name *</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. Chocolate Truffle Cake (1kg)" required autofocus>
+                        <input type="text" name="name" id="productName" class="form-control" placeholder="e.g. Tea Bun" required autofocus>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label font-weight-bold">SKU Code *</label>
-                        <input type="text" name="sku" class="form-control" placeholder="e.g. CHO-TRU-01" required>
+                        <div class="input-group">
+                            <input type="text" name="sku" id="productSku" class="form-control" placeholder="e.g. TB1001" required>
+                            <button type="button" class="btn btn-outline-secondary" id="btnAutoSku" title="Auto-generate SKU">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Auto-generated based on product name</small>
                     </div>
 
                     <div class="col-md-4">
@@ -96,5 +107,62 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('productName');
+    const skuInput = document.getElementById('productSku');
+    const btnAutoSku = document.getElementById('btnAutoSku');
+    const existingSkus = <?php echo json_encode($existingSkus ?? []); ?>;
+    let isManualSku = false;
+
+    function buildAutoSku(nameStr) {
+        if (!nameStr || !nameStr.trim()) return '';
+        const clean = nameStr.trim().replace(/[^a-zA-Z0-9\s]/g, '');
+        const allWords = clean.split(/\s+/).filter(w => w.length > 0);
+        const letterWords = allWords.filter(w => /^[a-zA-Z]/.test(w));
+        const words = letterWords.length > 0 ? letterWords : allWords;
+        let prefix = '';
+        if (words.length >= 2) {
+            prefix = words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+        } else if (words.length === 1) {
+            prefix = words[0].substring(0, 3).toUpperCase();
+        }
+        if (!prefix) prefix = 'PRD';
+
+        let counter = 1001;
+        let candidate = prefix + counter;
+        while (existingSkus.includes(candidate)) {
+            counter++;
+            candidate = prefix + counter;
+        }
+        return candidate;
+    }
+
+    if (nameInput && skuInput) {
+        nameInput.addEventListener('input', function() {
+            if (!isManualSku) {
+                skuInput.value = buildAutoSku(this.value);
+            }
+        });
+
+        skuInput.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                // If user changed value away from auto sku
+                isManualSku = (this.value !== buildAutoSku(nameInput.value));
+            } else {
+                isManualSku = false;
+            }
+        });
+
+        if (btnAutoSku) {
+            btnAutoSku.addEventListener('click', function() {
+                isManualSku = false;
+                skuInput.value = buildAutoSku(nameInput.value);
+            });
+        }
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

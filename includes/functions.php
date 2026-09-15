@@ -88,3 +88,51 @@ function getStatusBadge($status) {
             return '<span class="badge bg-secondary">' . ucfirst($status) . '</span>';
     }
 }
+
+function generateAutoSKU($productName, $db = null) {
+    if (empty(trim($productName))) {
+        return 'PRD' . rand(1000, 9999);
+    }
+    
+    $clean = preg_replace('/[^a-zA-Z0-9\s]/', '', trim($productName));
+    $allWords = array_values(array_filter(explode(' ', $clean)));
+    $letterWords = array_values(array_filter($allWords, function($w) {
+        return preg_match('/^[a-zA-Z]/', $w);
+    }));
+    
+    $words = !empty($letterWords) ? $letterWords : $allWords;
+    $prefix = '';
+    
+    if (count($words) >= 2) {
+        $prefix = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        if (isset($words[2])) {
+            $prefix .= strtoupper(substr($words[2], 0, 1));
+        }
+    } elseif (count($words) === 1) {
+        $prefix = strtoupper(substr($words[0], 0, 3));
+    }
+    
+    if (empty($prefix)) {
+        $prefix = 'PRD';
+    }
+    
+    if ($db) {
+        try {
+            $counter = 1001;
+            do {
+                $candidate = $prefix . sprintf('%04d', $counter);
+                $stmt = $db->prepare("SELECT COUNT(*) FROM products WHERE sku = ?");
+                $stmt->execute([$candidate]);
+                $exists = $stmt->fetchColumn();
+                if (!$exists) {
+                    return $candidate;
+                }
+                $counter++;
+            } while ($counter < 9999);
+        } catch (Exception $e) {
+            // fallback
+        }
+    }
+    
+    return $prefix . '1001';
+}
