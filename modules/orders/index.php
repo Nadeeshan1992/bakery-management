@@ -86,68 +86,73 @@ $orders = $stmt->fetchAll();
 </div>
 
 <!-- Orders Table -->
-<div class="card card-bakery p-4">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+<div class="card card-bakery p-3 shadow-sm border-0">
+    <div class="table-responsive-lg">
+        <table class="table table-hover align-middle mb-0" style="table-layout: fixed; width: 100%;">
             <thead class="table-light">
                 <tr>
-                    <th class="text-nowrap">Pre-Order #</th>
-                    <th>Customer Name</th>
-                    <th class="text-nowrap">Delivery Date & Time</th>
-                    <th class="text-end text-nowrap">Total Amount</th>
-                    <th class="text-center text-nowrap">Payment Status</th>
-                    <th class="text-center text-nowrap">Workflow Status</th>
-                    <th class="text-end text-nowrap">Actions</th>
+                    <th style="width: 14%;">Pre-Order #</th>
+                    <th style="width: 20%;">Customer</th>
+                    <th style="width: 18%;">Delivery Date</th>
+                    <th class="text-end" style="width: 14%;">Total Amount</th>
+                    <th class="text-center" style="width: 16%;">Payment</th>
+                    <th class="text-center" style="width: 18%;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($orders)): ?>
-                    <tr><td colspan="7" class="text-center text-muted py-4">No pre-orders found.</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">No pre-orders found.</td></tr>
                 <?php else: ?>
                     <?php foreach ($orders as $o): 
                         $balDue = max(0, (float)$o['total_amount'] - (float)$o['paid_amount']);
+                        $delivTimestamp = $o['delivery_date'] ? strtotime($o['delivery_date']) : false;
                     ?>
                         <tr>
-                            <td class="text-nowrap"><strong class="text-dark"><code><?php echo htmlspecialchars($o['order_number']); ?></code></strong></td>
                             <td>
-                                <strong class="text-dark d-block"><?php echo htmlspecialchars($o['customer_name'] ?? 'Walk-in'); ?></strong>
+                                <strong class="text-dark"><code><?php echo htmlspecialchars($o['order_number']); ?></code></strong>
+                                <span class="d-block mt-1"><?php echo getStatusBadge($o['order_status']); ?></span>
+                            </td>
+                            <td>
+                                <strong class="text-dark d-block text-truncate"><?php echo htmlspecialchars($o['customer_name'] ?? 'Walk-in'); ?></strong>
                                 <?php if (!empty($o['customer_phone'])): ?>
-                                    <small class="text-muted text-nowrap"><i class="fa-solid fa-phone me-1"></i><?php echo htmlspecialchars($o['customer_phone']); ?></small>
+                                    <small class="text-muted"><i class="fa-solid fa-phone me-1"></i><?php echo htmlspecialchars($o['customer_phone']); ?></small>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-nowrap">
-                                <?php if ($o['delivery_date']): ?>
-                                    <span class="text-primary fw-semibold"><i class="fa-regular fa-calendar me-1"></i><?php echo formatDateTime($o['delivery_date']); ?></span>
+                            <td>
+                                <?php if ($delivTimestamp): ?>
+                                    <span class="text-primary fw-semibold d-block"><i class="fa-regular fa-calendar me-1"></i><?php echo date('M d, Y', $delivTimestamp); ?></span>
+                                    <small class="text-muted"><i class="fa-regular fa-clock me-1"></i><?php echo date('h:i A', $delivTimestamp); ?></small>
                                 <?php else: ?>
                                     <span class="text-muted">Not Specified</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-end text-nowrap"><strong class="text-dark fs-6"><?php echo formatMoney($o['total_amount']); ?></strong></td>
-                            <td class="text-center text-nowrap">
+                            <td class="text-end">
+                                <strong class="text-dark fs-6"><?php echo formatMoney($o['total_amount']); ?></strong>
+                            </td>
+                            <td class="text-center">
                                 <?php if ($balDue > 0): ?>
-                                    <span class="badge bg-warning text-dark text-uppercase d-block mb-1">PARTIAL PAID</span>
+                                    <span class="badge bg-warning text-dark text-uppercase mb-1">PARTIAL</span>
                                     <small class="text-danger fw-bold d-block">Due: <?php echo formatMoney($balDue); ?></small>
                                 <?php else: ?>
-                                    <span class="badge bg-success text-uppercase d-block mb-1">PAID</span>
+                                    <span class="badge bg-success text-uppercase mb-1">PAID</span>
                                     <small class="text-muted text-uppercase d-block"><?php echo htmlspecialchars($o['payment_method']); ?></small>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-center text-nowrap"><?php echo getStatusBadge($o['order_status']); ?></td>
-                            <td class="text-end text-nowrap">
-                                <div class="d-inline-flex gap-1">
-                                    <a href="<?php echo BASE_URL; ?>modules/pos/invoice.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-outline-primary text-nowrap" target="_blank" title="Print Pre-Order Invoice">
-                                        <i class="fa-solid fa-print me-1"></i> Print
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="<?php echo BASE_URL; ?>modules/pos/invoice.php?id=<?php echo $o['id']; ?>" class="btn btn-outline-primary" target="_blank" data-bs-toggle="tooltip" title="Print Pre-Order Invoice">
+                                        <i class="fa-solid fa-print"></i>
                                     </a>
                                     <?php if ($balDue > 0): ?>
-                                        <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-success text-white fw-bold text-nowrap">
-                                            <i class="fa-solid fa-hand-holding-dollar me-1"></i> Settle
+                                        <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $o['id']; ?>" class="btn btn-success text-white" data-bs-toggle="tooltip" title="Settle Balance">
+                                            <i class="fa-solid fa-hand-holding-dollar"></i>
                                         </a>
                                     <?php endif; ?>
-                                    <a href="<?php echo BASE_URL; ?>modules/orders/edit.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-outline-secondary text-nowrap" title="Edit Order">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                    <a href="<?php echo BASE_URL; ?>modules/orders/edit.php?id=<?php echo $o['id']; ?>" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Edit Order">
+                                        <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
-                                    <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-light border text-nowrap">
-                                        <i class="fa-solid fa-eye me-1"></i> Details
+                                    <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $o['id']; ?>" class="btn btn-outline-info" data-bs-toggle="tooltip" title="View Details">
+                                        <i class="fa-solid fa-eye"></i>
                                     </a>
                                 </div>
                             </td>
