@@ -57,13 +57,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     </div>
                     <div class="col-md-4">
                         <label class="form-label font-weight-bold">SKU Code *</label>
-                        <div class="input-group">
-                            <input type="text" name="sku" id="productSku" class="form-control" placeholder="e.g. TB1001" required>
-                            <button type="button" class="btn btn-outline-secondary" id="btnAutoSku" title="Auto-generate SKU">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            </button>
-                        </div>
-                        <small class="text-muted">Auto-generated based on product name</small>
+                        <input type="text" name="sku" id="productSku" class="form-control bg-light" placeholder="e.g. TB1001" readonly required>
                     </div>
 
                     <div class="col-md-4">
@@ -112,9 +106,7 @@ require_once __DIR__ . '/../../includes/header.php';
 document.addEventListener('DOMContentLoaded', function() {
     const nameInput = document.getElementById('productName');
     const skuInput = document.getElementById('productSku');
-    const btnAutoSku = document.getElementById('btnAutoSku');
     const existingSkus = <?php echo json_encode($existingSkus ?? []); ?>;
-    let isManualSku = false;
 
     function buildAutoSku(nameStr) {
         if (!nameStr || !nameStr.trim()) return '';
@@ -141,26 +133,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (nameInput && skuInput) {
         nameInput.addEventListener('input', function() {
-            if (!isManualSku) {
-                skuInput.value = buildAutoSku(this.value);
-            }
+            skuInput.value = buildAutoSku(this.value);
         });
-
-        skuInput.addEventListener('input', function() {
-            if (this.value.trim() !== '') {
-                // If user changed value away from auto sku
-                isManualSku = (this.value !== buildAutoSku(nameInput.value));
-            } else {
-                isManualSku = false;
-            }
-        });
-
-        if (btnAutoSku) {
-            btnAutoSku.addEventListener('click', function() {
-                isManualSku = false;
-                skuInput.value = buildAutoSku(nameInput.value);
-            });
-        }
     }
 });
 </script>
