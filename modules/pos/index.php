@@ -21,14 +21,14 @@ $customers = $db->query("SELECT * FROM customers ORDER BY name ASC")->fetchAll()
     <div class="col-lg-7 col-xl-7 col-xxl-8">
         <div class="card card-bakery p-3 mb-2 shadow-sm">
             <!-- Search & Filters -->
-            <div class="row g-2 mb-2">
-                <div class="col-md-7">
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-md-5">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
                         <input type="text" id="posSearchInput" class="form-control" placeholder="Search product name or SKU code...">
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <select id="customerSelect" form="posForm" name="customer_id" class="form-select form-select-sm">
                         <?php foreach ($customers as $c): ?>
                             <?php 
@@ -43,6 +43,11 @@ $customers = $db->query("SELECT * FROM customers ORDER BY name ASC")->fetchAll()
                             </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <a href="<?php echo BASE_URL; ?>modules/orders/index.php?type=pos" class="btn btn-sm btn-outline-dark fw-bold w-100 text-nowrap">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> View POS Bills
+                    </a>
                 </div>
             </div>
 

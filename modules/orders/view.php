@@ -70,6 +70,9 @@ require_once __DIR__ . '/../../includes/header.php';
         <a href="<?php echo BASE_URL; ?>modules/orders/index.php" class="btn btn-outline-secondary">
             <i class="fa-solid fa-arrow-left me-1"></i> Back to Orders
         </a>
+        <a href="<?php echo BASE_URL; ?>modules/orders/edit.php?id=<?php echo $order['id']; ?>" class="btn btn-outline-primary">
+            <i class="fa-solid fa-pen-to-square me-1"></i> Edit Bill / Order
+        </a>
         <a href="<?php echo BASE_URL; ?>modules/pos/invoice.php?id=<?php echo $order['id']; ?>" class="btn btn-warning text-dark fw-bold" target="_blank">
             <i class="fa-solid fa-print me-1"></i> Print Invoice
         </a>

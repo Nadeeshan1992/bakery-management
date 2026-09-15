@@ -139,11 +139,17 @@ $orders = $stmt->fetchAll();
                             </td>
                             <td><?php echo getStatusBadge($o['order_status']); ?></td>
                             <td class="text-end">
+                                <a href="<?php echo BASE_URL; ?>modules/pos/invoice.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-outline-primary me-1 text-nowrap" target="_blank" title="Print Invoice">
+                                    <i class="fa-solid fa-print me-1"></i> Print
+                                </a>
                                 <?php if ($balDue > 0): ?>
                                     <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-success me-1 text-white fw-bold">
                                         <i class="fa-solid fa-hand-holding-dollar me-1"></i> Settle
                                     </a>
                                 <?php endif; ?>
+                                <a href="<?php echo BASE_URL; ?>modules/orders/edit.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-outline-secondary me-1" title="Edit Order / Bill">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                </a>
                                 <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $o['id']; ?>" class="btn btn-sm btn-light border">
                                     <i class="fa-solid fa-eye me-1"></i> Details
                                 </a>
