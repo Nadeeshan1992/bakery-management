@@ -45,8 +45,8 @@ $customers = $db->query("SELECT * FROM customers ORDER BY name ASC")->fetchAll()
                     </select>
                 </div>
                 <div class="col-md-3 text-end">
-                    <a href="<?php echo BASE_URL; ?>modules/orders/index.php?type=pos" class="btn btn-sm btn-outline-dark fw-bold w-100 text-nowrap">
-                        <i class="fa-solid fa-clock-rotate-left me-1"></i> View POS Bills
+                    <a href="<?php echo BASE_URL; ?>modules/orders/pos_bills.php" class="btn btn-sm btn-outline-dark fw-bold w-100 text-nowrap">
+                        <i class="fa-solid fa-receipt me-1 text-warning"></i> View POS Bills
                     </a>
                 </div>
             </div>

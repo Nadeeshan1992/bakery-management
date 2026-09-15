@@ -55,8 +55,7 @@ $pendingOrdersBadge = getPendingOrdersCount();
                     <i class="fa-solid fa-cash-register"></i> POS Counter
                 </a>
             </li>
-            <?php endif; ?>
-            <li class="<?php echo ($currentDir == 'orders') ? 'active' : ''; ?>">
+            <li class="<?php echo ($currentDir == 'orders' && $currentPage == 'index.php') ? 'active' : ''; ?>">
                 <a href="<?php echo BASE_URL; ?>modules/orders/index.php" class="d-flex justify-content-between align-items-center">
                     <span><i class="fa-solid fa-calendar-check"></i> Pre-Orders</span>
                     <?php if ($pendingOrdersBadge > 0): ?>
@@ -65,6 +64,12 @@ $pendingOrdersBadge = getPendingOrdersCount();
                 </a>
             </li>
             <?php if (in_array(getCurrentUserRole(), ['admin', 'owner', 'pos_operator'])): ?>
+            <li class="<?php echo ($currentPage == 'pos_bills.php') ? 'active' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>modules/orders/pos_bills.php">
+                    <i class="fa-solid fa-receipt text-warning"></i> POS Bills History
+                </a>
+            </li>
+            <?php endif; ?>
             <li class="<?php echo ($currentDir == 'products' && basename($_SERVER['PHP_SELF']) != 'daily_stock.php') ? 'active' : ''; ?>">
                 <a href="<?php echo BASE_URL; ?>modules/products/index.php">
                     <i class="fa-solid fa-bread-slice"></i> Products & Catalog
