@@ -21,7 +21,7 @@ $stmtSum = $db->prepare("
         COALESCE(SUM(total_amount), 0) as net_revenue,
         COALESCE(SUM(CASE WHEN order_type = 'pos' THEN total_amount ELSE 0 END), 0) as pos_sales_value,
         COALESCE(SUM(CASE WHEN order_type = 'preorder' THEN total_amount ELSE 0 END), 0) as preorder_sales_value,
-        COALESCE(SUM(paid_amount), 0) as settlement_value
+        COALESCE(SUM(LEAST(paid_amount, total_amount)), 0) as settlement_value
     FROM orders 
     WHERE DATE(created_at) BETWEEN ? AND ? AND order_status != 'cancelled' {$userWhereClause}
 ");
@@ -67,7 +67,7 @@ $stmtSalesPerson = $db->prepare("
         COALESCE(SUM(o.total_amount), 0) as total_sales_value,
         COALESCE(SUM(CASE WHEN o.order_type = 'pos' THEN o.total_amount ELSE 0 END), 0) as pos_sales_value,
         COALESCE(SUM(CASE WHEN o.order_type = 'preorder' THEN o.total_amount ELSE 0 END), 0) as preorder_sales_value,
-        COALESCE(SUM(o.paid_amount), 0) as total_collected
+        COALESCE(SUM(LEAST(o.paid_amount, o.total_amount)), 0) as total_collected
     FROM users u
     JOIN orders o ON o.created_by = u.id
     WHERE DATE(o.created_at) BETWEEN ? AND ? 

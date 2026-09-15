@@ -98,10 +98,11 @@ try {
     }
 
     $totalAmount = max(0, $subtotal - $discount - $totalReturnCredit);
-    $balanceDue = max(0, $totalAmount - $paidAmount);
-    $paymentStatus = ($paidAmount >= $totalAmount) ? 'paid' : (($paidAmount > 0) ? 'partial' : 'unpaid');
-    $orderStatus = ($paymentStatus === 'paid') ? 'completed' : 'pending';
     $changeAmount = max(0, $paidAmount - $totalAmount);
+    $actualPaidAmount = min($paidAmount, $totalAmount);
+    $balanceDue = max(0, $totalAmount - $actualPaidAmount);
+    $paymentStatus = ($actualPaidAmount >= $totalAmount) ? 'paid' : (($actualPaidAmount > 0) ? 'partial' : 'unpaid');
+    $orderStatus = ($paymentStatus === 'paid') ? 'completed' : 'pending';
 
     // Credit Limit Verification
     $stmtCustCheck = $db->prepare("SELECT credit_limit, opening_balance FROM customers WHERE id = ?");
@@ -135,7 +136,7 @@ try {
         $subtotal,
         ($discount + $totalReturnCredit),
         $totalAmount,
-        $paidAmount,
+        $actualPaidAmount,
         $changeAmount,
         $paymentMethod,
         (!empty($chequeRef) ? $chequeRef : NULL),

@@ -50,10 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $totalAmount = max(0, $subtotal - $discount);
-        if ($paidAmount < $totalAmount) {
-            $paidAmount = $totalAmount; // Default paid to total if zero or less
+        $tenderedPaidAmount = floatval($_POST['paid_amount'] ?? 0);
+        if ($tenderedPaidAmount < $totalAmount) {
+            $tenderedPaidAmount = $totalAmount; // Default paid to total if zero or less
         }
-        $changeAmount = max(0, $paidAmount - $totalAmount);
+        $changeAmount = max(0, $tenderedPaidAmount - $totalAmount);
+        $actualPaidAmount = min($tenderedPaidAmount, $totalAmount);
 
         // Generate unique order number (e.g. ORD-20260902-1234)
         $orderNumber = 'ORD-' . date('Ymd') . '-' . rand(1000, 9999);
@@ -69,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subtotal,
             $discount,
             $totalAmount,
-            $paidAmount,
+            $actualPaidAmount,
             $changeAmount,
             $paymentMethod,
             (!empty($chequeRef) ? $chequeRef : NULL),
