@@ -28,6 +28,11 @@ $stmtSum = $db->prepare("
 $stmtSum->execute([$startDate, $endDate]);
 $summary = $stmtSum->fetch();
 
+$posSalesValue = (float)($summary['pos_sales_value'] ?? 0);
+$preorderSalesValue = (float)($summary['preorder_sales_value'] ?? 0);
+$settlementValue = (float)($summary['settlement_value'] ?? 0);
+$totalNetRevenue = $posSalesValue + $settlementValue;
+
 // Breakdown by Payment Method
 $stmtPay = $db->prepare("
     SELECT payment_method, COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as amt 
@@ -121,7 +126,7 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
             <h6 class="text-muted text-uppercase fw-bold mb-1">
                 <i class="fa-solid fa-calendar-check text-primary me-1"></i> Pre-Order Value
             </h6>
-            <h2 class="fw-bold text-primary mb-0"><?php echo formatMoney($summary['preorder_sales_value']); ?></h2>
+            <h2 class="fw-bold text-primary mb-0"><?php echo formatMoney($preorderSalesValue); ?></h2>
             <small class="text-muted mt-1 d-block">Booked Pre-Orders</small>
         </div>
     </div>
@@ -130,7 +135,7 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
             <h6 class="text-muted text-uppercase fw-bold mb-1">
                 <i class="fa-solid fa-cash-register text-info me-1"></i> POS Sales Value
             </h6>
-            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($summary['pos_sales_value']); ?></h2>
+            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($posSalesValue); ?></h2>
             <small class="text-muted mt-1 d-block">Instant POS Sales</small>
         </div>
     </div>
@@ -139,7 +144,7 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
             <h6 class="text-muted text-uppercase fw-bold mb-1">
                 <i class="fa-solid fa-hand-holding-dollar text-success me-1"></i> Settlement Value
             </h6>
-            <h2 class="fw-bold text-success mb-0"><?php echo formatMoney($summary['settlement_value']); ?></h2>
+            <h2 class="fw-bold text-success mb-0"><?php echo formatMoney($settlementValue); ?></h2>
             <small class="text-muted mt-1 d-block">Total Settlements Collected</small>
         </div>
     </div>
@@ -148,8 +153,8 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
             <h6 class="text-muted text-uppercase fw-bold mb-1">
                 <i class="fa-solid fa-chart-line text-warning me-1"></i> Total Net Revenue
             </h6>
-            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($summary['net_revenue']); ?></h2>
-            <small class="text-muted mt-1 d-block"><?php echo number_format($summary['total_orders_count']); ?> Total Orders</small>
+            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($totalNetRevenue); ?></h2>
+            <small class="text-muted mt-1 d-block">POS Sales + Settlement Value</small>
         </div>
     </div>
 </div>
