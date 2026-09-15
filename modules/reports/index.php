@@ -14,13 +14,14 @@ $staffUsers = $db->query("SELECT id, full_name, username, role FROM users ORDER 
 
 $userWhereClause = $salesPersonFilter > 0 ? " AND created_by = " . intval($salesPersonFilter) : "";
 
-// Financial Summary
+// Financial Summary (POS Sales, Pre-Order Value & Settlements)
 $stmtSum = $db->prepare("
     SELECT 
         COUNT(*) as total_orders_count,
-        COALESCE(SUM(subtotal), 0) as gross_sales,
-        COALESCE(SUM(discount), 0) as total_discounts,
-        COALESCE(SUM(total_amount), 0) as net_revenue
+        COALESCE(SUM(total_amount), 0) as net_revenue,
+        COALESCE(SUM(CASE WHEN order_type = 'pos' THEN total_amount ELSE 0 END), 0) as pos_sales_value,
+        COALESCE(SUM(CASE WHEN order_type = 'preorder' THEN total_amount ELSE 0 END), 0) as preorder_sales_value,
+        COALESCE(SUM(paid_amount), 0) as settlement_value
     FROM orders 
     WHERE DATE(created_at) BETWEEN ? AND ? AND order_status != 'cancelled' {$userWhereClause}
 ");
@@ -49,7 +50,7 @@ $stmtTop = $db->prepare("
 $stmtTop->execute([$startDate, $endDate]);
 $topProducts = $stmtTop->fetchAll();
 
-// Individual Sales Person Sales Value Breakdown
+// Individual Sales Person Sales Value & Pre-Order / Settlement Breakdown
 $stmtSalesPerson = $db->prepare("
     SELECT 
         u.id as user_id,
@@ -57,9 +58,9 @@ $stmtSalesPerson = $db->prepare("
         u.username,
         u.role,
         COUNT(o.id) as total_orders,
-        COALESCE(SUM(o.subtotal), 0) as gross_sales,
-        COALESCE(SUM(o.discount), 0) as total_discounts,
-        COALESCE(SUM(o.total_amount), 0) as net_sales,
+        COALESCE(SUM(o.total_amount), 0) as total_sales_value,
+        COALESCE(SUM(CASE WHEN o.order_type = 'pos' THEN o.total_amount ELSE 0 END), 0) as pos_sales_value,
+        COALESCE(SUM(CASE WHEN o.order_type = 'preorder' THEN o.total_amount ELSE 0 END), 0) as preorder_sales_value,
         COALESCE(SUM(o.paid_amount), 0) as total_collected
     FROM users u
     JOIN orders o ON o.created_by = u.id
@@ -67,7 +68,7 @@ $stmtSalesPerson = $db->prepare("
       AND o.order_status != 'cancelled'
       " . ($salesPersonFilter > 0 ? " AND u.id = " . intval($salesPersonFilter) : "") . "
     GROUP BY u.id
-    ORDER BY net_sales DESC
+    ORDER BY total_sales_value DESC
 ");
 $stmtSalesPerson->execute([$startDate, $endDate]);
 $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
@@ -76,7 +77,7 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0">Sales & Financial Reporting</h4>
-        <p class="text-muted mb-0">Analyze revenue, payment channels, and top-performing bakery items</p>
+        <p class="text-muted mb-0">Analyze revenue, pre-orders, settlement collections, and top bakery items</p>
     </div>
     <button onclick="window.print()" class="btn btn-outline-secondary">
         <i class="fa-solid fa-print me-1"></i> Print Summary Report
@@ -116,27 +117,39 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
 <!-- Key Performance Indicators -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">Total Orders</h6>
-            <h2 class="fw-bold text-dark mb-0"><?php echo number_format($summary['total_orders_count']); ?></h2>
+        <div class="card card-bakery p-4 text-center border-primary shadow-sm">
+            <h6 class="text-muted text-uppercase fw-bold mb-1">
+                <i class="fa-solid fa-calendar-check text-primary me-1"></i> Pre-Order Value
+            </h6>
+            <h2 class="fw-bold text-primary mb-0"><?php echo formatMoney($summary['preorder_sales_value']); ?></h2>
+            <small class="text-muted mt-1 d-block">Booked Pre-Orders</small>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">Gross Sales</h6>
-            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($summary['gross_sales']); ?></h2>
+        <div class="card card-bakery p-4 text-center shadow-sm">
+            <h6 class="text-muted text-uppercase fw-bold mb-1">
+                <i class="fa-solid fa-cash-register text-info me-1"></i> POS Sales Value
+            </h6>
+            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($summary['pos_sales_value']); ?></h2>
+            <small class="text-muted mt-1 d-block">Instant POS Sales</small>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">Total Discounts</h6>
-            <h2 class="fw-bold text-danger mb-0">-<?php echo formatMoney($summary['total_discounts']); ?></h2>
+        <div class="card card-bakery p-4 text-center border-success shadow-sm">
+            <h6 class="text-muted text-uppercase fw-bold mb-1">
+                <i class="fa-solid fa-hand-holding-dollar text-success me-1"></i> Settlement Value
+            </h6>
+            <h2 class="fw-bold text-success mb-0"><?php echo formatMoney($summary['settlement_value']); ?></h2>
+            <small class="text-muted mt-1 d-block">Total Settlements Collected</small>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card card-bakery p-4 text-center border-success">
-            <h6 class="text-muted text-uppercase fw-bold mb-1">Net Revenue</h6>
-            <h2 class="fw-bold text-success mb-0"><?php echo formatMoney($summary['net_revenue']); ?></h2>
+        <div class="card card-bakery p-4 text-center border-warning shadow-sm">
+            <h6 class="text-muted text-uppercase fw-bold mb-1">
+                <i class="fa-solid fa-chart-line text-warning me-1"></i> Total Net Revenue
+            </h6>
+            <h2 class="fw-bold text-dark mb-0"><?php echo formatMoney($summary['net_revenue']); ?></h2>
+            <small class="text-muted mt-1 d-block"><?php echo number_format($summary['total_orders_count']); ?> Total Orders</small>
         </div>
     </div>
 </div>
@@ -161,10 +174,10 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
                             <th>Sales Staff Member</th>
                             <th>Role</th>
                             <th class="text-center">Total Orders</th>
-                            <th class="text-end">Gross Sales</th>
-                            <th class="text-end">Discounts</th>
-                            <th class="text-end">Net Sales Value</th>
-                            <th class="text-end">Total Collected</th>
+                            <th class="text-end">POS Sales</th>
+                            <th class="text-end">Pre-Order Value</th>
+                            <th class="text-end">Total Net Sales</th>
+                            <th class="text-end">Settlement Value</th>
                             <th class="text-end">Pending Balance</th>
                         </tr>
                     </thead>
@@ -173,7 +186,7 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
                             <tr><td colspan="8" class="text-center text-muted py-4">No individual sales records found for this date range.</td></tr>
                         <?php else: ?>
                             <?php foreach ($salesPersonBreakdown as $sp): 
-                                $pendingBal = max(0, (float)$sp['net_sales'] - (float)$sp['total_collected']);
+                                $pendingBal = max(0, (float)$sp['total_sales_value'] - (float)$sp['total_collected']);
                             ?>
                                 <tr>
                                     <td>
@@ -186,10 +199,10 @@ $salesPersonBreakdown = $stmtSalesPerson->fetchAll();
                                         </span>
                                     </td>
                                     <td class="text-center fw-bold fs-6"><?php echo number_format($sp['total_orders']); ?></td>
-                                    <td class="text-end"><?php echo formatMoney($sp['gross_sales']); ?></td>
-                                    <td class="text-end text-danger">-<?php echo formatMoney($sp['total_discounts']); ?></td>
-                                    <td class="text-end fw-bold text-success fs-6"><?php echo formatMoney($sp['net_sales']); ?></td>
-                                    <td class="text-end text-primary fw-bold"><?php echo formatMoney($sp['total_collected']); ?></td>
+                                    <td class="text-end text-dark"><?php echo formatMoney($sp['pos_sales_value']); ?></td>
+                                    <td class="text-end text-primary fw-bold"><?php echo formatMoney($sp['preorder_sales_value']); ?></td>
+                                    <td class="text-end fw-bold text-dark fs-6"><?php echo formatMoney($sp['total_sales_value']); ?></td>
+                                    <td class="text-end text-success fw-bold"><?php echo formatMoney($sp['total_collected']); ?></td>
                                     <td class="text-end fw-bold <?php echo $pendingBal > 0 ? 'text-danger' : 'text-muted'; ?>">
                                         <?php echo formatMoney($pendingBal); ?>
                                     </td>

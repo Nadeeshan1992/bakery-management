@@ -28,9 +28,9 @@ try {
     $stmtSum = $db->prepare("
         SELECT 
             COUNT(*) as total_orders_count,
-            COALESCE(SUM(o.subtotal), 0) as gross_sales,
-            COALESCE(SUM(o.discount), 0) as total_discounts,
             COALESCE(SUM(o.total_amount), 0) as net_sales,
+            COALESCE(SUM(CASE WHEN o.order_type = 'pos' THEN o.total_amount ELSE 0 END), 0) as pos_sales_value,
+            COALESCE(SUM(CASE WHEN o.order_type = 'preorder' THEN o.total_amount ELSE 0 END), 0) as preorder_sales_value,
             COALESCE(SUM(o.paid_amount), 0) as total_collected
         FROM orders o 
         {$userWhere}
@@ -39,8 +39,8 @@ try {
     $sum = $stmtSum->fetch(PDO::FETCH_ASSOC);
 
     $totalOrdersCount = (int)($sum['total_orders_count'] ?? 0);
-    $grossSales = floatval($sum['gross_sales'] ?? 0);
-    $totalDiscounts = floatval($sum['total_discounts'] ?? 0);
+    $posSalesValue = floatval($sum['pos_sales_value'] ?? 0);
+    $preorderSalesValue = floatval($sum['preorder_sales_value'] ?? 0);
     $netSales = floatval($sum['net_sales'] ?? 0);
     $totalCollected = floatval($sum['total_collected'] ?? 0);
     $totalOutstanding = max(0.00, $netSales - $totalCollected);
@@ -133,12 +133,12 @@ try {
             'role' => $authUser['role']
         ],
         'summary' => [
-            'total_orders_count' => $totalOrdersCount,
-            'gross_sales' => $grossSales,
-            'total_discounts' => $totalDiscounts,
-            'net_sales' => $netSales,
-            'total_collected' => $totalCollected,
-            'total_outstanding' => $totalOutstanding
+            'total_orders_count'   => $totalOrdersCount,
+            'pos_sales_value'      => $posSalesValue,
+            'preorder_sales_value' => $preorderSalesValue,
+            'settlement_value'     => $totalCollected,
+            'net_sales'            => $netSales,
+            'total_outstanding'    => $totalOutstanding
         ],
         'payment_breakdown' => $paymentBreakdown,
         'top_products' => $topProducts,
