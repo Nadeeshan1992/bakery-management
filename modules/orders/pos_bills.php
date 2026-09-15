@@ -114,14 +114,14 @@ foreach ($posBills as $b) {
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>Bill / Receipt #</th>
-                    <th>Date & Time</th>
+                    <th class="text-nowrap">Bill / Receipt #</th>
+                    <th class="text-nowrap">Date & Time</th>
                     <th>Customer</th>
-                    <th>Payment Method</th>
-                    <th class="text-end">Total Bill Amount</th>
-                    <th>Cashier</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
+                    <th class="text-center text-nowrap">Payment Method</th>
+                    <th class="text-end text-nowrap">Total Bill Amount</th>
+                    <th class="text-center text-nowrap">Cashier</th>
+                    <th class="text-center text-nowrap">Status</th>
+                    <th class="text-end text-nowrap">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -130,33 +130,35 @@ foreach ($posBills as $b) {
                 <?php else: ?>
                     <?php foreach ($posBills as $b): ?>
                         <tr>
-                            <td><strong class="text-dark"><code><?php echo htmlspecialchars($b['order_number']); ?></code></strong></td>
-                            <td><small class="text-muted"><?php echo formatDateTime($b['created_at']); ?></small></td>
+                            <td class="text-nowrap"><strong class="text-dark"><code><?php echo htmlspecialchars($b['order_number']); ?></code></strong></td>
+                            <td class="text-nowrap"><small class="text-muted"><?php echo formatDateTime($b['created_at']); ?></small></td>
                             <td>
-                                <strong class="text-dark"><?php echo htmlspecialchars($b['customer_name'] ?? 'Walk-in Customer'); ?></strong>
+                                <strong class="text-dark d-block"><?php echo htmlspecialchars($b['customer_name'] ?? 'Walk-in Customer'); ?></strong>
                                 <?php if (!empty($b['customer_phone'])): ?>
-                                    <small class="text-muted d-block"><i class="fa-solid fa-phone me-1"></i><?php echo htmlspecialchars($b['customer_phone']); ?></small>
+                                    <small class="text-muted text-nowrap"><i class="fa-solid fa-phone me-1"></i><?php echo htmlspecialchars($b['customer_phone']); ?></small>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td class="text-center text-nowrap">
                                 <span class="badge bg-secondary text-uppercase"><?php echo htmlspecialchars($b['payment_method']); ?></span>
                                 <?php if (!empty($b['cheque_ref'])): ?>
-                                    <small class="d-block text-primary fw-bold">Ref: <?php echo htmlspecialchars($b['cheque_ref']); ?></small>
+                                    <small class="d-block text-primary fw-bold text-nowrap">Ref: <?php echo htmlspecialchars($b['cheque_ref']); ?></small>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-end fw-bold text-success fs-6"><?php echo formatMoney($b['total_amount']); ?></td>
-                            <td><small class="text-muted"><?php echo htmlspecialchars($b['created_by_name'] ?? 'Staff'); ?></small></td>
-                            <td><?php echo getStatusBadge($b['order_status']); ?></td>
-                            <td class="text-end">
-                                <a href="<?php echo BASE_URL; ?>modules/pos/invoice.php?id=<?php echo $b['id']; ?>" class="btn btn-sm btn-outline-primary me-1 text-nowrap" target="_blank" title="Print Bill Receipt">
-                                    <i class="fa-solid fa-print me-1"></i> Print
-                                </a>
-                                <a href="<?php echo BASE_URL; ?>modules/orders/edit.php?id=<?php echo $b['id']; ?>" class="btn btn-sm btn-outline-secondary me-1" title="Edit Bill">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit
-                                </a>
-                                <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $b['id']; ?>" class="btn btn-sm btn-light border" title="View Details">
-                                    <i class="fa-solid fa-eye me-1"></i> Details
-                                </a>
+                            <td class="text-end fw-bold text-success fs-6 text-nowrap"><?php echo formatMoney($b['total_amount']); ?></td>
+                            <td class="text-center text-nowrap"><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($b['created_by_name'] ?? 'Staff'); ?></span></td>
+                            <td class="text-center text-nowrap"><?php echo getStatusBadge($b['order_status']); ?></td>
+                            <td class="text-end text-nowrap">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="<?php echo BASE_URL; ?>modules/pos/invoice.php?id=<?php echo $b['id']; ?>" class="btn btn-sm btn-outline-primary text-nowrap" target="_blank" title="Print Bill Receipt">
+                                        <i class="fa-solid fa-print me-1"></i> Print
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>modules/orders/edit.php?id=<?php echo $b['id']; ?>" class="btn btn-sm btn-outline-secondary text-nowrap" title="Edit Bill">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>modules/orders/view.php?id=<?php echo $b['id']; ?>" class="btn btn-sm btn-light border text-nowrap" title="View Details">
+                                        <i class="fa-solid fa-eye me-1"></i> Details
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
