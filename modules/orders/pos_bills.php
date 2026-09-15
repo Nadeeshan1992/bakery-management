@@ -119,7 +119,6 @@ foreach ($posBills as $b) {
                     <th>Customer</th>
                     <th>Payment Method</th>
                     <th class="text-end">Total Bill Amount</th>
-                    <th class="text-end">Paid Amount</th>
                     <th>Cashier</th>
                     <th>Status</th>
                     <th class="text-end">Actions</th>
@@ -127,7 +126,7 @@ foreach ($posBills as $b) {
             </thead>
             <tbody>
                 <?php if (empty($posBills)): ?>
-                    <tr><td colspan="9" class="text-center text-muted py-4">No POS bills found for the selected date range.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">No POS bills found for the selected date range.</td></tr>
                 <?php else: ?>
                     <?php foreach ($posBills as $b): ?>
                         <tr>
@@ -146,7 +145,6 @@ foreach ($posBills as $b) {
                                 <?php endif; ?>
                             </td>
                             <td class="text-end fw-bold text-success fs-6"><?php echo formatMoney($b['total_amount']); ?></td>
-                            <td class="text-end fw-bold text-dark"><?php echo formatMoney($b['paid_amount']); ?></td>
                             <td><small class="text-muted"><?php echo htmlspecialchars($b['created_by_name'] ?? 'Staff'); ?></small></td>
                             <td><?php echo getStatusBadge($b['order_status']); ?></td>
                             <td class="text-end">
