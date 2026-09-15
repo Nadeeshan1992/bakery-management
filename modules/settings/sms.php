@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/sms_helper.php';
 
-requireRole(['admin', 'owner']);
+requireRole(['admin']);
 
 $db = getDB();
 

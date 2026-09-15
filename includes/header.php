@@ -115,6 +115,8 @@ $pendingOrdersBadge = getPendingOrdersCount();
                     <i class="fa-solid fa-users-gear"></i> User Management
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if (getCurrentUserRole() === 'admin'): ?>
             <li class="<?php echo ($currentDir == 'settings' && $currentPage == 'sms.php') ? 'active' : ''; ?>">
                 <a href="<?php echo BASE_URL; ?>modules/settings/sms.php">
                     <i class="fa-solid fa-comment-sms text-warning"></i> SMS Gateway
