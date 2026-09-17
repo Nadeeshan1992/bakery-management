@@ -1,8 +1,5 @@
 -- Bakery Management System SQL Schema
 
-CREATE DATABASE IF NOT EXISTS `bakery_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `bakery_db`;
-
 -- 1. Users Table
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -179,14 +176,13 @@ CREATE TABLE IF NOT EXISTS `production_logs` (
 
 -- SEED DATA
 
--- Default Users (Password for all default users: password123)
--- Hash: $2y$10$4hKzKnp78d6bU7tBvWq5O.0Hn9V1P9Y3HkK6vD1bN8Qx0Y1z2a3b4
+-- Default Users (Password for default users: password123)
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `role`, `status`) VALUES
-(1, 'owner', '$2y$10$e.wR.M8Hk5n4P9Y3HkK6vD1bN8Qx0Y1z2a3b4c5d6e7f8g9h0i1j2', 'Business Owner', 'owner@bakery.com', 'owner', 'active'),
-(2, 'admin', '$2y$10$e.wR.M8Hk5n4P9Y3HkK6vD1bN8Qx0Y1z2a3b4c5d6e7f8g9h0i1j2', 'Manager Admin', 'admin@bakery.com', 'admin', 'active'),
-(3, 'sales', '$2y$10$e.wR.M8Hk5n4P9Y3HkK6vD1bN8Qx0Y1z2a3b4c5d6e7f8g9h0i1j2', 'John Sales', 'sales@bakery.com', 'sales_person', 'active'),
-(4, 'pos', '$2y$10$e.wR.M8Hk5n4P9Y3HkK6vD1bN8Qx0Y1z2a3b4c5d6e7f8g9h0i1j2', 'Sarah POS Operator', 'pos@bakery.com', 'pos_operator', 'active')
-ON DUPLICATE KEY UPDATE `id`=`id`;
+(1, 'owner', '$2y$10$ygueWY.RMxvD6uPE6WemO.IyGdpBX7NGs67TorBnZHfmkILvTLmMa', 'Business Owner', 'owner@bakery.com', 'owner', 'active'),
+(2, 'admin', '$2y$10$ygueWY.RMxvD6uPE6WemO.IyGdpBX7NGs67TorBnZHfmkILvTLmMa', 'Manager Admin', 'admin@bakery.com', 'admin', 'active'),
+(3, 'sales', '$2y$10$ygueWY.RMxvD6uPE6WemO.IyGdpBX7NGs67TorBnZHfmkILvTLmMa', 'John Sales', 'sales@bakery.com', 'sales_person', 'active'),
+(4, 'pos', '$2y$10$ygueWY.RMxvD6uPE6WemO.IyGdpBX7NGs67TorBnZHfmkILvTLmMa', 'Sarah POS Operator', 'pos@bakery.com', 'pos_operator', 'active')
+ON DUPLICATE KEY UPDATE `password`='$2y$10$ygueWY.RMxvD6uPE6WemO.IyGdpBX7NGs67TorBnZHfmkILvTLmMa';
 
 -- Categories
 INSERT INTO `categories` (`id`, `name`, `description`) VALUES

@@ -135,22 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="fa-solid fa-right-to-bracket me-2"></i> Log In
             </button>
         </form>
-
-        <div class="demo-credential-box mt-3 text-center">
-            <strong class="d-block mb-1 text-dark"><i class="fa-solid fa-key text-warning me-1"></i> Default Admin Login:</strong>
-            <div class="d-flex justify-content-center flex-wrap gap-2 mt-2">
-                <button class="btn btn-xs btn-outline-warning text-dark fw-bold text-nowrap" onclick="setDemo('admin')"><i class="fa-solid fa-user-shield me-1"></i> Admin (admin / password123)</button>
-            </div>
-        </div>
     </div>
 </div>
-
-<script>
-function setDemo(role) {
-    document.getElementById('username').value = role;
-    document.getElementById('password').value = 'password123';
-}
-</script>
 
 </body>
 </html>
