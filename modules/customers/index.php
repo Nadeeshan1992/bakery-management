@@ -86,11 +86,12 @@ require_once __DIR__ . '/../../includes/header.php';
                     <th>Other Disc %</th>
                     <th class="text-center">Total Orders</th>
                     <th>Total Spend</th>
+                    <th class="text-center" style="width: 105px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($customers)): ?>
-                    <tr><td colspan="9" class="text-center text-muted py-4">No customers registered yet. Click 'Register New Customer' to add one.</td></tr>
+                    <tr><td colspan="10" class="text-center text-muted py-4">No customers registered yet. Click 'Register New Customer' to add one.</td></tr>
                 <?php else: ?>
                     <?php foreach ($customers as $c): ?>
                         <tr>
@@ -108,6 +109,22 @@ require_once __DIR__ . '/../../includes/header.php';
                             <td><span class="badge bg-success"><?php echo number_format($c['discount_other'] ?? $c['special_discount'] ?? 0, 2); ?>%</span></td>
                             <td class="text-center"><span class="badge bg-secondary"><?php echo $c['total_orders']; ?></span></td>
                             <td><strong class="text-success"><?php echo formatMoney($c['total_spent']); ?></strong></td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="<?php echo BASE_URL; ?>modules/customers/edit.php?id=<?php echo $c['id']; ?>" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Edit Customer">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <?php if ($c['id'] != 1): ?>
+                                        <a href="<?php echo BASE_URL; ?>modules/customers/delete.php?id=<?php echo $c['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete customer \'<?php echo addslashes(htmlspecialchars(($c['title'] ?? '') . ' ' . $c['name'])); ?>\'?');" data-bs-toggle="tooltip" title="Delete Customer">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <button type="button" class="btn btn-outline-secondary disabled" title="Default Walk-in customer cannot be deleted" disabled>
+                                            <i class="fa-solid fa-lock"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
