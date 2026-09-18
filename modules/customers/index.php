@@ -63,6 +63,9 @@ require_once __DIR__ . '/../../includes/header.php';
         <p class="text-muted mb-0">Manage customer accounts, category discount rates, credit limits, and purchase history</p>
     </div>
     <div class="d-flex gap-2">
+        <button class="btn btn-outline-success fw-bold" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+            <i class="fa-solid fa-file-excel me-1"></i> Import Excel (.xlsx)
+        </button>
         <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
             <i class="fa-solid fa-plus me-1"></i> Quick Add Modal
         </button>
@@ -190,6 +193,68 @@ require_once __DIR__ . '/../../includes/header.php';
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" name="add_customer" value="1" class="btn btn-primary fw-bold">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Import Excel (.xlsx / .csv) -->
+<div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fa-solid fa-file-excel text-success me-2"></i> Import Customers from Excel
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="<?php echo BASE_URL; ?>modules/customers/import.php" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Download Template Box -->
+                    <div class="p-3 mb-3 bg-light rounded border d-flex align-items-center justify-content-between">
+                        <div>
+                            <strong class="d-block text-dark small">Sample Excel Template:</strong>
+                            <small class="text-muted">Use this format to prepare your list</small>
+                        </div>
+                        <a href="<?php echo BASE_URL; ?>assets/templates/customer_import_template.xlsx" download class="btn btn-sm btn-outline-success text-nowrap fw-semibold">
+                            <i class="fa-solid fa-download me-1"></i> Sample .xlsx
+                        </a>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold text-dark">
+                            <span class="text-danger">*</span> Select .xlsx or .csv File:
+                        </label>
+                        <input type="file" name="excel_file" class="form-control" accept=".xlsx,.csv" required>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label font-weight-bold small text-muted text-uppercase mb-1">Duplicate Phone Handling:</label>
+                        <div class="form-check small mb-1">
+                            <input class="form-check-input" type="radio" name="duplicate_action" id="modalDupSkip" value="skip" checked>
+                            <label class="form-check-label" for="modalDupSkip">
+                                <strong>Skip existing</strong> phone numbers
+                            </label>
+                        </div>
+                        <div class="form-check small">
+                            <input class="form-check-input" type="radio" name="duplicate_action" id="modalDupUpdate" value="update">
+                            <label class="form-check-label" for="modalDupUpdate">
+                                <strong>Update existing</strong> customer details
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <a href="<?php echo BASE_URL; ?>modules/customers/import.php" class="small text-decoration-none">
+                        <i class="fa-solid fa-up-right-from-square me-1"></i> Advanced Import Page
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success btn-sm fw-bold">
+                            <i class="fa-solid fa-upload me-1"></i> Upload & Import
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
